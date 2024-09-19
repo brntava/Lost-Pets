@@ -17,7 +17,9 @@ type CommentsProps = {
 };
 
 export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
-  const { loggedUser, comments, setComments } = usePetsContext();
+  const { loggedUser, comments, setComments, tabIndex } = usePetsContext();
+
+  console.log('item', item.comments);
 
   const [textInput, setTextInput] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -27,10 +29,8 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   // ARRUMAR COMENTARIO NAO ATUALIZANDO
 
   useEffect(() => {
-    if (item.comments.length === 0 || comments.length === 0) setComments(item.comments);
-    console.log('TCL  item.comments:', item.comments.length);
-    console.log('TCL  item', comments.length);
-  }, [visible]);
+    if (comments.length === 0) setComments(item.comments);
+  }, []);
 
   useEffect(() => {
     setTextInput('');
@@ -40,7 +40,6 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   const formattedDate = format(new Date(), 'dd/MM/yyyy');
 
   const handleAddComment = async (content: string) => {
-    console.log('TCL  content:', content);
     if (content === '') return;
 
     try {
@@ -149,59 +148,61 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
               comments.map((comment, index: number) => {
                 const isUserComment = comment.user.id === loggedUser.id;
 
-                return (
-                  <>
-                    <Card key={index} style={styles.modalCard}>
-                      <Card.Title
-                        title={comment.user.userName}
-                        subtitle={formattedDate}
-                        titleVariant="titleSmall"
-                        subtitleVariant="labelSmall"
-                        left={(props) => (
-                          <Avatar.Icon
-                            {...props}
-                            icon="account"
-                            style={{ backgroundColor: '#ededed' }}
-                          />
-                        )}
-                        right={(props) => (
-                          <>
-                            {isUserComment && (
-                              <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                                {editingCommentId !== comment.id && (
+                if (comment.missingPetId === item.id) {
+                  return (
+                    <>
+                      <Card key={index} style={styles.modalCard}>
+                        <Card.Title
+                          title={comment.user.userName}
+                          subtitle={formattedDate}
+                          titleVariant="titleSmall"
+                          subtitleVariant="labelSmall"
+                          left={(props) => (
+                            <Avatar.Icon
+                              {...props}
+                              icon="account"
+                              style={{ backgroundColor: '#ededed' }}
+                            />
+                          )}
+                          right={(props) => (
+                            <>
+                              {isUserComment && (
+                                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                                  {editingCommentId !== comment.id && (
+                                    <IconButton
+                                      {...props}
+                                      icon="pencil"
+                                      size={15}
+                                      style={{ paddingLeft: 10 }}
+                                      onPress={() => handleEditComment(comment.id)}
+                                    />
+                                  )}
                                   <IconButton
                                     {...props}
-                                    icon="pencil"
+                                    icon="trash-can-outline"
                                     size={15}
-                                    style={{ paddingLeft: 10 }}
-                                    onPress={() => handleEditComment(comment.id)}
+                                    style={{ paddingRight: 10 }}
+                                    onPress={() => handleDeleteComment(comment.id)}
                                   />
-                                )}
-                                <IconButton
-                                  {...props}
-                                  icon="trash-can-outline"
-                                  size={15}
-                                  style={{ paddingRight: 10 }}
-                                  onPress={() => handleDeleteComment(comment.id)}
-                                />
-                              </View>
-                            )}
-                          </>
-                        )}
-                      />
-                      <Card.Content>
-                        <Text>
-                          {editingCommentId && editingCommentId === comment.id
-                            ? textInput
-                            : comment.content}
-                        </Text>
-                      </Card.Content>
-                    </Card>
-                    <Chip icon="chat-processing-outline" style={styles.answerComment}>
-                      Responder...
-                    </Chip>
-                  </>
-                );
+                                </View>
+                              )}
+                            </>
+                          )}
+                        />
+                        <Card.Content>
+                          <Text>
+                            {editingCommentId && editingCommentId === comment.id
+                              ? textInput
+                              : comment.content}
+                          </Text>
+                        </Card.Content>
+                      </Card>
+                      <Chip icon="chat-processing-outline" style={styles.answerComment}>
+                        Responder...
+                      </Chip>
+                    </>
+                  );
+                }
               })
             ) : (
               <Text variant="titleMedium" style={styles.modalNoComments}>
@@ -234,22 +235,25 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
             )}
           </View>
         ) : (
-          <KeyboardAvoidingView behavior="position">
+          <KeyboardAvoidingView behavior="padding">
             <View style={styles.modalInputContainerIOS}>
               <TextInput
                 placeholder="Digite o comentário..."
                 maxLength={100}
                 value={textInput}
                 onChangeText={(text) => setTextInput(text)}
-                onBlur={() => handleAddComment(textInput)}
                 mode="outlined"
                 returnKeyType="done"
+                ref={commentInput}
               />
               <IconButton
                 size={22}
                 icon="check"
                 style={styles.modalInputContainerIcon}
-                onPress={() => handleAddComment(textInput)}
+                onPress={() => {
+                  if (editingCommentId) handleSaveEditComment();
+                  else handleAddComment(textInput);
+                }}
               />
             </View>
           </KeyboardAvoidingView>
