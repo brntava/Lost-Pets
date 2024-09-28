@@ -125,7 +125,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       setLoading(false);
 
-      alert('Ocorreu um erro inesperado');
+      alert(`Ocorreu um erro inesperado: ${err.response?.data}`);
 
       throw new Error(`Error ${err}`);
     }

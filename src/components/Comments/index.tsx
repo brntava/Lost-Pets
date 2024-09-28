@@ -17,7 +17,7 @@ type CommentsProps = {
 };
 
 export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
-  const { loggedUser, comments, setComments, tabIndex } = usePetsContext();
+  const { loggedUser, comments, setComments } = usePetsContext();
 
   console.log('item', item.comments);
 
@@ -144,7 +144,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
         </View>
         <View style={styles.modalCardContainer}>
           <ScrollView>
-            {comments.length > 0 ? (
+            {comments.length > 0 &&
               comments.map((comment, index: number) => {
                 const isUserComment = comment.user.id === loggedUser.id;
 
@@ -203,12 +203,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                     </>
                   );
                 }
-              })
-            ) : (
-              <Text variant="titleMedium" style={styles.modalNoComments}>
-                Não ha comentarios
-              </Text>
-            )}
+              })}
           </ScrollView>
         </View>
         {Platform.OS === 'android' ? (

@@ -11,47 +11,35 @@ type RequestConfig = {
 const URL = process.env.URL;
 
 export const registerUser = async (body: UserRequestBody) => {
-  try {
-    return await axios.post(`${URL}/api/User/register`, body);
-  } catch (err) {
-    throw new Error(`Error ${err}`);
-  }
+  return await axios.post(`${URL}/api/User/register`, body);
 };
 
 export const loginUser = async (body: UserLoginBody) => {
-  try {
-    const { data } = await axios.post<LoginResponse>(`${URL}/api/User/login`, body, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  const { data } = await axios.post<LoginResponse>(`${URL}/api/User/login`, body, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-    const { token, user } = data;
+  const { token, user } = data;
 
-    return {
-      token,
-      user,
-    };
-  } catch (err) {
-    throw new Error(`Error ${err.response.data}`);
-  }
+  return {
+    token,
+    user,
+  };
 };
 
 export const getUser = async (id: string, method: string, body?: UserRequestBody) => {
-  try {
-    const config: RequestConfig = {
-      method,
-      url: `/user/${id}`,
-    };
+  const config: RequestConfig = {
+    method,
+    url: `/user/${id}`,
+  };
 
-    if (body) config.data = body;
+  if (body) config.data = body;
 
-    const { data } = await axios(config);
+  const { data } = await axios(config);
 
-    if (!data) return;
+  if (!data) return;
 
-    return data;
-  } catch (err) {
-    throw new Error(`Error ${err}`);
-  }
+  return data;
 };
