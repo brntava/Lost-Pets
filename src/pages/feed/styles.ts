@@ -2,8 +2,6 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
-    maxHeight: '100%',
     height: '100%',
     marginBottom: 20,
     paddingBottom: 15,

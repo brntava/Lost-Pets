@@ -6,10 +6,19 @@ import { IconButton } from 'react-native-paper';
 import { styles } from './styles';
 
 import { usePetsContext } from '~/context/petsContext';
-import { ImageType } from '~/types/photoTypes';
+import { ImageType } from '~/types/imageTypes';
 
-export const ImagePickerScreen = () => {
-  const { petPhoto, setPetPhoto } = usePetsContext();
+type ImageProps = {
+  isEditing?: boolean;
+  petId?: string;
+  editingImages?: any;
+};
+
+const baseURL = process.env.URL;
+
+export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProps) => {
+  const { petPhoto, setPetPhoto, setEditingAddPetPhoto, setEditingRemovePetPhoto } =
+    usePetsContext();
 
   const pickImage = async () => {
     if (Platform.OS === 'web') return;
@@ -30,10 +39,40 @@ export const ImagePickerScreen = () => {
 
     if (result.canceled) return;
 
+    const formData = new FormData();
+
+    formData.append('formFiles', {
+      uri: result.assets[0].uri,
+      name: result.assets[0].fileName || 'name',
+      type: result.assets[0].type,
+    });
+
+    if (isEditing) {
+      setEditingAddPetPhoto([
+        {
+          added: {
+            petId,
+            formData,
+          },
+        },
+      ]);
+    }
+
     setPetPhoto((img: any) => [...img, result.assets[0]]);
   };
 
   const removeImage = (indexToRemove: number) => {
+    if (isEditing) {
+      setEditingRemovePetPhoto([
+        {
+          removed: {
+            petId,
+            imageId: indexToRemove,
+          },
+        },
+      ]);
+    }
+
     setPetPhoto((images: ImageType[]) => images.filter((_, index) => index !== indexToRemove));
   };
 
@@ -58,6 +97,25 @@ export const ImagePickerScreen = () => {
                   size={20}
                   style={styles.trashIcon}
                   onPress={() => removeImage(index)}
+                />
+              </View>
+            );
+          })}
+        </>
+      )}
+      {editingImages && (
+        <>
+          {editingImages.map((img: any, index: number) => {
+            const imgURL = img.url.replace('http://localhost:5241', `${baseURL}/`);
+
+            return (
+              <View style={styles.imageContainer} key={index}>
+                <Image source={{ uri: imgURL }} style={styles.image} />
+                <IconButton
+                  icon="trash-can"
+                  size={20}
+                  style={styles.trashIcon}
+                  onPress={() => removeImage(img.id)}
                 />
               </View>
             );

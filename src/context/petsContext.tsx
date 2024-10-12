@@ -1,7 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
-import { addMissingPet, editMissingPet, getMissingPet } from '~/services/MissingPets/missingPets';
+import {
+  addMissingPet,
+  addMissingPetImage,
+  deleteMissingPetImage,
+  editMissingPet,
+  getMissingPet,
+} from '~/services/MissingPets/missingPets';
 import { createSighthing, deleteSighthing } from '~/services/MissingPets/sighthings';
 import { loginUser, registerUser } from '~/services/Users/users';
 import { CommentsType } from '~/types/commentTypes';
@@ -67,6 +73,10 @@ type MyContextType = {
   handleSearchMissingPet: () => void;
   postSightings: any;
   setPostSightings: (postSightings: any) => void;
+  editingAddPetPhoto: any;
+  setEditingAddPetPhoto: (editingAddPetPhoto: any) => void;
+  editingRemovePetPhoto: any;
+  setEditingRemovePetPhoto: (editingRemovePetPhoto: any) => void;
 };
 
 const PetsContext = createContext<MyContextType | undefined>(undefined);
@@ -97,6 +107,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     address: '',
   });
   const [petPhoto, setPetPhoto] = useState<any>([]);
+  const [editingAddPetPhoto, setEditingAddPetPhoto] = useState<any>([]);
+  const [editingRemovePetPhoto, setEditingRemovePetPhoto] = useState<any>([]);
   const [missingPetContact, setMissingPetContact] = useState('');
   const [postSightings, setPostSightings] = useState<any>([]);
 
@@ -219,7 +231,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       data.age === null ||
       data.species === '' ||
       data.description === '' ||
-      sightings.length === 0
+      sightings.length === 0 ||
+      petPhoto.length === 0
     ) {
       alert('É necessário preencher todos os campos informados e pelos menos um avistamento');
       return;
@@ -239,11 +252,6 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         name: data.name,
         species: data.species,
         age: data.age,
-        photos: petPhoto.map((photo: ImageType, index: number) => ({
-          id: index.toString(),
-          location: photo.uri,
-          content: '',
-        })),
         description: data.description,
       },
       status: 0,
@@ -256,12 +264,24 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
-      await addMissingPet(postData, token);
+      const { id } = await addMissingPet(postData, token);
+
+      const formData = new FormData();
+
+      formData.append('formFiles', {
+        uri: petPhoto[0].uri,
+        name: petPhoto[0].fileName || 'name',
+        type: petPhoto[0].type,
+      });
+
+      if (id) {
+        await addMissingPetImage(id, formData, token);
+      }
+
+      handleSearchMissingPet();
 
       setPetPhoto([]);
       setMissingPetContact('');
-
-      handleSearchMissingPet();
 
       setLoading(false);
       setTabIndex(0);
@@ -269,10 +289,6 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error:', err);
 
       setLoading(false);
-
-      return {
-        error: err,
-      };
     }
   };
 
@@ -292,6 +308,26 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       }
 
+      if (editingAddPetPhoto.length > 0) {
+        if (editingAddPetPhoto[0].added) {
+          await addMissingPetImage(
+            editingAddPetPhoto[0].added.petId,
+            editingAddPetPhoto[0].added.formData,
+            autCookie
+          );
+        }
+      }
+
+      if (editingRemovePetPhoto.length > 0) {
+        if (editingRemovePetPhoto[0].removed) {
+          await deleteMissingPetImage(
+            editingRemovePetPhoto[0].removed.petId,
+            editingRemovePetPhoto[0].removed.imageId,
+            autCookie
+          );
+        }
+      }
+
       const body = {
         pet: {
           id,
@@ -303,15 +339,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         status: 0,
       };
 
-      setLoading(true);
-
-      await editMissingPet(id, body, autCookie);
-
-      handleSearchMissingPet();
-
       setLoading(false);
-
-      navigation.navigate('feed');
     } catch (err) {
       setLoading(false);
 
@@ -381,6 +409,10 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         handleSearchMissingPet,
         postSightings,
         setPostSightings,
+        editingAddPetPhoto,
+        setEditingAddPetPhoto,
+        editingRemovePetPhoto,
+        setEditingRemovePetPhoto,
       }}>
       {children}
     </PetsContext.Provider>

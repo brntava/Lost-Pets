@@ -19,14 +19,10 @@ type CommentsProps = {
 export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   const { loggedUser, comments, setComments } = usePetsContext();
 
-  console.log('item', item.comments);
-
   const [textInput, setTextInput] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 
   const commentInput = useRef(null);
-
-  // ARRUMAR COMENTARIO NAO ATUALIZANDO
 
   useEffect(() => {
     if (comments.length === 0) setComments(item.comments);

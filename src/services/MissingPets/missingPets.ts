@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-import { EditMissingPetType, MissingPetTypeRequest } from '~/types/missingPetTypes';
+import { EditMissingPetType, MissingPetTypeRequest, MissingPetType } from '~/types/missingPetTypes';
 
 const URL = process.env.URL;
 
 export const addMissingPet = async (body: MissingPetTypeRequest, autCookie: string) => {
-  const { data } = await axios.post<Promise<MissingPetTypeRequest>>(`${URL}/api/MissingPet`, body, {
+  const { data } = await axios.post<Promise<MissingPetType>>(`${URL}/api/MissingPet`, body, {
     headers: {
       Authorization: `Bearer ${autCookie}`,
     },
@@ -72,4 +72,27 @@ export const deactivateMissingPet = async (petId: string) => {
   } catch (err) {
     throw new Error(`Error ${err}`);
   }
+};
+
+export const addMissingPetImage = async (petId: string, body: FormData, autCookie: string) => {
+  const { data } = await axios.post<Promise<MissingPetTypeRequest>>(
+    `${URL}/api/MissingPet/${petId}/image`,
+    body,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${autCookie}`,
+      },
+    }
+  );
+
+  return data;
+};
+
+export const deleteMissingPetImage = async (petId: string, imgId: string, autCookie: string) => {
+  return await axios.delete(`${URL}/api/MissingPet/${petId}/image/${imgId}`, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
+  });
 };

@@ -26,7 +26,10 @@ export const CreateLostPetPost = () => {
   } = usePetsContext();
 
   const routes = useRoute();
+
   const editingPost = routes.params?.editingPost;
+  console.log('TCL  editingPost:', editingPost);
+  const petImages = editingPost?.images;
 
   const [petName, setPetName] = useState<string>(editingPost?.pet.name ?? '');
   const [petSpecies, setPetSpecies] = useState<string>(editingPost?.pet.species ?? '');
@@ -322,7 +325,11 @@ export const CreateLostPetPost = () => {
                   })}
               </>
             )}
-            <ImagePickerScreen />
+            <ImagePickerScreen
+              isEditing={!!editingPost}
+              petId={editingPost?.id}
+              editingImages={petImages}
+            />
             <TouchableOpacity
               style={styles.submitButton}
               onPress={() => {

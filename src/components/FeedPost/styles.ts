@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardImg: {
-    width: 280,
+    width: 335,
     height: 230,
     marginRight: 8,
   },

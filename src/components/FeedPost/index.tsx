@@ -9,15 +9,17 @@ import { SightingMap } from '../SightingMap';
 
 import { usePetsContext } from '~/context/petsContext';
 import { deleteMissingPet } from '~/services/MissingPets/missingPets';
+import { PostImageType } from '~/types/imageTypes';
 import { MissingPetType } from '~/types/missingPetTypes';
 import { SightingModalNavigationProp } from '~/types/navigationTypes';
-import { PhotoType } from '~/types/photoTypes';
 import { getUserToken } from '~/utils/getUserToken';
 
 type FeedPostProps = {
   item: MissingPetType;
   index: number;
 };
+
+const URL = process.env.URL;
 
 export const FeedPost = ({ item, index }: FeedPostProps) => {
   const { handleRemoveSighting, loggedUser, handleSearchMissingPet, setLoading } = usePetsContext();
@@ -100,6 +102,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                           id: item.id,
                           pet: item.pet,
                           sightings: item.sightings,
+                          images: item.images,
                         },
                       })
                     }
@@ -148,9 +151,17 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.cardImgContinainer}>
-              {item.pet.photos?.map((photo: PhotoType, index: number) => {
+              {item.images?.map((image: PostImageType, index: number) => {
+                const imgURL = image.url.replace('http://localhost:5241', `${URL}/`);
+
                 return (
-                  <Card.Cover key={index} source={{ uri: photo.location }} style={styles.cardImg} />
+                  <Card.Cover
+                    key={index}
+                    source={{
+                      uri: imgURL,
+                    }}
+                    style={styles.cardImg}
+                  />
                 );
               })}
             </View>
