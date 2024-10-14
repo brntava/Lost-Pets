@@ -107,8 +107,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     address: '',
   });
   const [petPhoto, setPetPhoto] = useState<any>([]);
-  const [editingAddPetPhoto, setEditingAddPetPhoto] = useState<any>([]);
-  const [editingRemovePetPhoto, setEditingRemovePetPhoto] = useState<any>([]);
+  const [editingAddPetPhoto, setEditingAddPetPhoto] = useState<any>({});
+  const [editingRemovePetPhoto, setEditingRemovePetPhoto] = useState<any>({});
   const [missingPetContact, setMissingPetContact] = useState('');
   const [postSightings, setPostSightings] = useState<any>([]);
 
@@ -148,8 +148,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email,
-        password,
+        email: 'bruno5@gmail.com',
+        password: '123456',
       });
 
       const { token, user } = data;
@@ -308,24 +308,10 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       }
 
-      if (editingAddPetPhoto.length > 0) {
-        if (editingAddPetPhoto[0].added) {
-          await addMissingPetImage(
-            editingAddPetPhoto[0].added.petId,
-            editingAddPetPhoto[0].added.formData,
-            autCookie
-          );
-        }
-      }
+      if (petPhoto.length === 0) {
+        alert('É necessário pelo menos uma foto');
 
-      if (editingRemovePetPhoto.length > 0) {
-        if (editingRemovePetPhoto[0].removed) {
-          await deleteMissingPetImage(
-            editingRemovePetPhoto[0].removed.petId,
-            editingRemovePetPhoto[0].removed.imageId,
-            autCookie
-          );
-        }
+        return;
       }
 
       const body = {
@@ -339,8 +325,43 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         status: 0,
       };
 
+      setLoading(true);
+
+      if (editingAddPetPhoto) {
+        if (editingAddPetPhoto.added) {
+          await addMissingPetImage(
+            editingAddPetPhoto.added.petId,
+            editingAddPetPhoto.added.formData,
+            autCookie
+          );
+
+          setEditingAddPetPhoto({});
+        }
+      }
+
+      if (editingRemovePetPhoto) {
+        if (editingRemovePetPhoto.removed) {
+          await deleteMissingPetImage(
+            editingRemovePetPhoto.removed.petId,
+            editingRemovePetPhoto.removed.imageId,
+            autCookie
+          );
+
+          setEditingRemovePetPhoto({});
+        }
+      }
+
+      await editMissingPet(id, body, autCookie);
+
+      handleSearchMissingPet();
+
+      setPetPhoto([]);
+
       setLoading(false);
+
+      navigation.navigate('feed');
     } catch (err) {
+      setPetPhoto([]);
       setLoading(false);
 
       console.error('Error:', err.response?.data.errors);

@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View, Image, Platform, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
@@ -19,6 +19,12 @@ const baseURL = process.env.URL;
 export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProps) => {
   const { petPhoto, setPetPhoto, setEditingAddPetPhoto, setEditingRemovePetPhoto } =
     usePetsContext();
+
+  const [editPostImages, setEditPostImages] = useState(editingImages ?? []);
+
+  useEffect(() => {
+    if (isEditing) setPetPhoto(editingImages);
+  }, []);
 
   const pickImage = async () => {
     if (Platform.OS === 'web') return;
@@ -48,39 +54,37 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
     });
 
     if (isEditing) {
-      setEditingAddPetPhoto([
-        {
-          added: {
-            petId,
-            formData,
-          },
+      setEditingAddPetPhoto({
+        added: {
+          petId,
+          formData,
         },
-      ]);
+      });
     }
 
     setPetPhoto((img: any) => [...img, result.assets[0]]);
   };
 
-  const removeImage = (indexToRemove: number) => {
+  const removeImage = (imgIndex: number) => {
     if (isEditing) {
-      setEditingRemovePetPhoto([
-        {
-          removed: {
-            petId,
-            imageId: indexToRemove,
-          },
+      setEditingRemovePetPhoto({
+        removed: {
+          petId,
+          imageId: editPostImages[imgIndex].id,
         },
-      ]);
+      });
+
+      setEditPostImages((images: ImageType[]) => images.filter((_, index) => index !== imgIndex));
     }
 
-    setPetPhoto((images: ImageType[]) => images.filter((_, index) => index !== indexToRemove));
+    setPetPhoto((images: ImageType[]) => images.filter((_, index) => index !== imgIndex));
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Fotos</Text>
-        {petPhoto.length < 4 && (
+        {petPhoto?.length < 4 && (
           <TouchableOpacity onPress={pickImage}>
             <Text style={styles.addImg}>+</Text>
           </TouchableOpacity>
@@ -89,33 +93,16 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
       {petPhoto && (
         <>
           {petPhoto.map((img: any, index: number) => {
+            const imgURL = img.url?.replace('http://localhost:5241', `${baseURL}/`);
+
             return (
               <View style={styles.imageContainer} key={index}>
-                <Image source={{ uri: img.uri }} style={styles.image} />
+                <Image source={{ uri: img.uri ?? imgURL }} style={styles.image} />
                 <IconButton
                   icon="trash-can"
                   size={20}
                   style={styles.trashIcon}
                   onPress={() => removeImage(index)}
-                />
-              </View>
-            );
-          })}
-        </>
-      )}
-      {editingImages && (
-        <>
-          {editingImages.map((img: any, index: number) => {
-            const imgURL = img.url.replace('http://localhost:5241', `${baseURL}/`);
-
-            return (
-              <View style={styles.imageContainer} key={index}>
-                <Image source={{ uri: imgURL }} style={styles.image} />
-                <IconButton
-                  icon="trash-can"
-                  size={20}
-                  style={styles.trashIcon}
-                  onPress={() => removeImage(img.id)}
                 />
               </View>
             );

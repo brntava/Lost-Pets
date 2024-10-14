@@ -28,7 +28,6 @@ export const CreateLostPetPost = () => {
   const routes = useRoute();
 
   const editingPost = routes.params?.editingPost;
-  console.log('TCL  editingPost:', editingPost);
   const petImages = editingPost?.images;
 
   const [petName, setPetName] = useState<string>(editingPost?.pet.name ?? '');
@@ -213,7 +212,7 @@ export const CreateLostPetPost = () => {
             <TextInput
               ref={opContactInput}
               style={styles.input}
-              value={userContact[1].content ?? loggedUser.contacts[1].content}
+              value={userContact[1]?.content ?? loggedUser.contacts[1]?.content}
               onChangeText={(text) => {
                 let formattedText = text.replace(/\D/g, '');
 
