@@ -327,27 +327,23 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
-      if (editingAddPetPhoto) {
-        if (editingAddPetPhoto.added) {
-          await addMissingPetImage(
-            editingAddPetPhoto.added.petId,
-            editingAddPetPhoto.added.formData,
-            autCookie
-          );
+      if (editingRemovePetPhoto) {
+        if (editingRemovePetPhoto.removed?.length > 0) {
+          for (const { petId, imageId } of editingRemovePetPhoto.removed) {
+            await deleteMissingPetImage(petId, imageId, autCookie);
+          }
 
-          setEditingAddPetPhoto({});
+          setEditingRemovePetPhoto({ removed: [] });
         }
       }
 
-      if (editingRemovePetPhoto) {
-        if (editingRemovePetPhoto.removed) {
-          await deleteMissingPetImage(
-            editingRemovePetPhoto.removed.petId,
-            editingRemovePetPhoto.removed.imageId,
-            autCookie
-          );
+      if (editingAddPetPhoto) {
+        if (editingAddPetPhoto.added?.length > 0) {
+          for (const { petId, formData } of editingAddPetPhoto.added) {
+            await addMissingPetImage(petId, formData, autCookie);
+          }
 
-          setEditingRemovePetPhoto({});
+          setEditingAddPetPhoto({ added: [] });
         }
       }
 
@@ -364,7 +360,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setPetPhoto([]);
       setLoading(false);
 
-      console.error('Error:', err.response?.data.errors);
+      console.error('Error:', err);
     }
   };
 

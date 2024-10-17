@@ -14,6 +14,21 @@ type ImageProps = {
   editingImages?: any;
 };
 
+type EditingPetPhotoParams = {
+  added?: [
+    {
+      petId: string;
+      formData: FormData;
+    },
+  ];
+  removed?: [
+    {
+      petId: string;
+      imageId: string;
+    },
+  ];
+};
+
 const baseURL = process.env.URL;
 
 export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProps) => {
@@ -54,12 +69,15 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
     });
 
     if (isEditing) {
-      setEditingAddPetPhoto({
-        added: {
-          petId,
-          formData,
-        },
-      });
+      setEditingAddPetPhoto((photos: EditingPetPhotoParams) => ({
+        added: [
+          ...(photos?.added || []),
+          {
+            petId,
+            formData,
+          },
+        ],
+      }));
     }
 
     setPetPhoto((img: any) => [...img, result.assets[0]]);
@@ -67,12 +85,15 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
 
   const removeImage = (imgIndex: number) => {
     if (isEditing) {
-      setEditingRemovePetPhoto({
-        removed: {
-          petId,
-          imageId: editPostImages[imgIndex].id,
-        },
-      });
+      setEditingRemovePetPhoto((photos: EditingPetPhotoParams) => ({
+        removed: [
+          ...(photos?.removed || []),
+          {
+            petId,
+            imageId: editPostImages[imgIndex]?.id,
+          },
+        ],
+      }));
 
       setEditPostImages((images: ImageType[]) => images.filter((_, index) => index !== imgIndex));
     }
