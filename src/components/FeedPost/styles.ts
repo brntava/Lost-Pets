@@ -99,4 +99,21 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  imageModal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    flex: 1,
+    height: '100%',
+  },
+  fullImage: {
+    width: '90%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 10,
+  },
 });

@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { View, Animated } from 'react-native';
 
-export const ImageSkeleton = () => {
+import { styles } from './styles';
+
+type SkeletonProps = {
+  fullScreen?: boolean;
+};
+
+export const ImageSkeleton = ({ fullScreen }: SkeletonProps) => {
   const animation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -32,27 +38,8 @@ export const ImageSkeleton = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.line, animatedStyle]} />
+    <View style={fullScreen ? styles.containerFull : styles.container}>
+      <Animated.View style={[fullScreen ? styles.lineFull : styles.line, animatedStyle]} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: 335,
-    height: 230,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    marginRight: 8,
-  },
-  line: {
-    height: 200,
-    backgroundColor: '#e0e0e0',
-    marginVertical: 5,
-    borderRadius: 5,
-    width: '100%',
-  },
-});

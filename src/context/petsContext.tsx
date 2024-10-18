@@ -148,8 +148,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email: 'bruno5@gmail.com',
-        password: '123456',
+        email,
+        password,
       });
 
       const { token, user } = data;
@@ -161,8 +161,10 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         index: 0,
         routes: [{ name: 'feed' }],
       });
-    } catch {
+    } catch (err) {
       alert('Usúario ou senha incorreta');
+
+      console.log(err);
       return;
     } finally {
       setLoading(false);
@@ -266,17 +268,19 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const { id } = await addMissingPet(postData, token);
 
-      const formData = new FormData();
+      const uploadPromises = petPhoto.map(async (photo: any) => {
+        const formData = new FormData();
 
-      formData.append('formFiles', {
-        uri: petPhoto[0].uri,
-        name: petPhoto[0].fileName || 'name',
-        type: petPhoto[0].type,
+        formData.append('formFiles', {
+          uri: photo.uri,
+          name: photo.fileName || 'name',
+          type: photo.type,
+        });
+
+        await addMissingPetImage(id, formData, token);
       });
 
-      if (id) {
-        await addMissingPetImage(id, formData, token);
-      }
+      await Promise.all(uploadPromises);
 
       handleSearchMissingPet();
 
