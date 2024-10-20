@@ -196,7 +196,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.cardImgContinainer}>
                 {item.images?.map((image: PostImageType, index: number) => {
-                  const imgURL = image.url.replace('http://localhost:5241', `${URL}/`);
+                  const imgURL = image.url.replace('https://localhost:5241', `${URL}/`);
 
                   return (
                     <TouchableOpacity key={index} onPress={() => openImageModal(imgURL)}>
@@ -204,10 +204,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                         source={{
                           uri: imgURL,
                         }}
-                        onLoadStart={() => setImageLoad(true)}
-                        onLoad={() => setImageLoad(false)}
                         onError={() => {
-                          setImageLoad(false);
                           console.error('Erro ao carregar a imagem');
                         }}
                         style={styles.cardImg}

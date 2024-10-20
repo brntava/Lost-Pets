@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
+import { updateContact } from '~/services/Contacts/contacts';
 import {
   addMissingPet,
   addMissingPetImage,
@@ -11,11 +12,13 @@ import {
 import { createSighthing, deleteSighthing } from '~/services/MissingPets/sighthings';
 import { loginUser, registerUser } from '~/services/Users/users';
 import { CommentsType } from '~/types/commentTypes';
+import { ContactType } from '~/types/contactTypes';
 import { LocationType } from '~/types/locationTypes';
 import { PetTypeRequest } from '~/types/petTypes';
 import { ImageType } from '~/types/photoTypes';
 import { SighthingType } from '~/types/sighthingTypes';
 import { LoggedUser, LoginResponse, UserRequestBody } from '~/types/userTypes';
+import { findUpdatedContacts } from '~/utils/findUpdatedContacts';
 import { getUserToken } from '~/utils/getUserToken';
 import { saveUserToken } from '~/utils/saveUserToken';
 
@@ -148,8 +151,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email,
-        password,
+        email: 'bruno5@gmail.com',
+        password: '123456',
       });
 
       const { token, user } = data;
@@ -233,8 +236,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       data.age === null ||
       data.species === '' ||
       data.description === '' ||
-      sightings.length === 0 ||
-      petPhoto.length === 0
+      sightings.length === 0
+      // petPhoto.length === 0
     ) {
       alert('É necessário preencher todos os campos informados e pelos menos um avistamento');
       return;
@@ -266,9 +269,19 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
+      const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser.contacts);
+      console.log('TCL  contactsToUpdate:', contactsToUpdate);
+
+      const updateContactPromises = contactsToUpdate?.map((contact: ContactType) => {
+        return updateContact(contact.id, {
+          type: 0,
+          contact: contact.content,
+        });
+      });
+
       const { id } = await addMissingPet(postData, token);
 
-      const uploadPromises = petPhoto.map(async (photo: any) => {
+      const uploadPromises = petPhoto?.map(async (photo: any) => {
         const formData = new FormData();
 
         formData.append('formFiles', {
@@ -280,7 +293,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         await addMissingPetImage(id, formData, token);
       });
 
-      await Promise.all(uploadPromises);
+      await Promise.all([...updateContactPromises, ...uploadPromises]);
 
       handleSearchMissingPet();
 

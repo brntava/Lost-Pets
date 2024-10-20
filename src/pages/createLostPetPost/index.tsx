@@ -93,6 +93,7 @@ export const CreateLostPetPost = () => {
       species: petSpecies,
       age: ageUnit === 'Meses' ? `00${petAge}` : `11${petAge}`,
       description: petDescription,
+      contact: userContact,
     });
   };
 

@@ -1,3 +1,5 @@
+import { ContactType } from './contactTypes';
+
 export interface PetType {
   id: string;
   name: string;
@@ -11,4 +13,5 @@ export interface PetTypeRequest {
   species: string;
   age: string;
   description: string;
+  contact?: ContactType[];
 }

@@ -5,8 +5,10 @@ type RequestBody = {
   contact: string;
 };
 
+const URL = process.env.URL;
+
 export const createContact = async (body: RequestBody) => {
-  const { data } = await axios.post('/api/Contact', {
+  const { data } = await axios.post(`${URL}/api/Contact`, {
     body,
   });
 
@@ -14,7 +16,7 @@ export const createContact = async (body: RequestBody) => {
 };
 
 export const updateContact = async (contactId: string, body: RequestBody) => {
-  const { data } = await axios.put(`/api/Contact/${contactId}`, {
+  const { data } = await axios.put(`${URL}/api/Contact/${contactId}`, {
     body,
   });
 
@@ -22,5 +24,5 @@ export const updateContact = async (contactId: string, body: RequestBody) => {
 };
 
 export const deleteContact = async (contactId: string) => {
-  return await axios.delete(`/api/Contact/${contactId}`);
+  return await axios.delete(`${URL}/api/Contact/${contactId}`);
 };
