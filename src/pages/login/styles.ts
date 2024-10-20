@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     width: 170,
     height: 170,
     borderRadius: 100,
-    marginBottom: 54,
+    marginBottom: 30,
     marginTop: 60,
   },
   Image: {
@@ -61,7 +61,7 @@ export const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     width: 250,
-    marginTop: 30,
+    marginTop: 20,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 12,

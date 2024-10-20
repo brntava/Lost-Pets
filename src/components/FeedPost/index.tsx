@@ -23,7 +23,8 @@ type FeedPostProps = {
 const URL = process.env.URL;
 
 export const FeedPost = ({ item, index }: FeedPostProps) => {
-  const { handleRemoveSighting, loggedUser, handleSearchMissingPet, setLoading } = usePetsContext();
+  const { handleRemoveSighting, loggedUser, handleSearchMissingPet, setLoading, visitorUser } =
+    usePetsContext();
 
   const petName = item.pet.name;
   const petSpecies = item.pet.species;
@@ -40,7 +41,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
 
   const navigation = useNavigation<SightingModalNavigationProp>();
 
-  const isUserPost = item.user.id === loggedUser.id;
+  const isUserPost = item.user.id === loggedUser?.id;
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -237,15 +238,23 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                   <IconButton
                     icon="plus"
                     size={20}
-                    onPress={() => handleAddPostSighting()}
+                    onPress={() => {
+                      if (visitorUser) return;
+
+                      handleAddPostSighting();
+                    }}
                     iconColor="#fff"
-                    style={{ backgroundColor: '#228c80' }}
+                    style={
+                      !visitorUser
+                        ? { backgroundColor: '#228c80' }
+                        : { backgroundColor: 'transparent' }
+                    }
                   />
                 </View>
                 <ScrollView>
                   {item.sightings.map(
                     ({ sightingDate, description, location, id, user }, index: number) => {
-                      const isUserSighting = user.id === loggedUser.id;
+                      const isUserSighting = user.id === loggedUser?.id;
 
                       return (
                         <Card style={styles.sightingCard} key={id}>

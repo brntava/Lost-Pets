@@ -17,7 +17,7 @@ type CommentsProps = {
 };
 
 export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
-  const { loggedUser, comments, setComments } = usePetsContext();
+  const { loggedUser, comments, setComments, visitorUser } = usePetsContext();
 
   const [textInput, setTextInput] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -142,7 +142,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
           <ScrollView>
             {comments.length > 0 &&
               comments.map((comment, index: number) => {
-                const isUserComment = comment.user.id === loggedUser.id;
+                const isUserComment = comment.user.id === loggedUser?.id;
 
                 if (comment.missingPetId === item.id) {
                   return (
@@ -202,52 +202,56 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
               })}
           </ScrollView>
         </View>
-        {Platform.OS === 'android' ? (
-          <View style={styles.modalInputContainerAndroid}>
-            <TextInput
-              placeholder="Digite o comentário..."
-              maxLength={100}
-              value={textInput}
-              onChangeText={(text) => setTextInput(text)}
-              mode="outlined"
-              returnKeyType="done"
-              ref={commentInput}
-            />
-            {textInput !== '' && (
-              <IconButton
-                size={22}
-                icon="check"
-                style={styles.modalInputContainerIcon}
-                onPress={() => {
-                  if (editingCommentId) handleSaveEditComment();
-                  else handleAddComment(textInput);
-                }}
-              />
+        {!visitorUser && (
+          <>
+            {Platform.OS === 'android' ? (
+              <View style={styles.modalInputContainerAndroid}>
+                <TextInput
+                  placeholder="Digite o comentário..."
+                  maxLength={100}
+                  value={textInput}
+                  onChangeText={(text) => setTextInput(text)}
+                  mode="outlined"
+                  returnKeyType="done"
+                  ref={commentInput}
+                />
+                {textInput !== '' && (
+                  <IconButton
+                    size={22}
+                    icon="check"
+                    style={styles.modalInputContainerIcon}
+                    onPress={() => {
+                      if (editingCommentId) handleSaveEditComment();
+                      else handleAddComment(textInput);
+                    }}
+                  />
+                )}
+              </View>
+            ) : (
+              <KeyboardAvoidingView behavior="padding">
+                <View style={styles.modalInputContainerIOS}>
+                  <TextInput
+                    placeholder="Digite o comentário..."
+                    maxLength={100}
+                    value={textInput}
+                    onChangeText={(text) => setTextInput(text)}
+                    mode="outlined"
+                    returnKeyType="done"
+                    ref={commentInput}
+                  />
+                  <IconButton
+                    size={22}
+                    icon="check"
+                    style={styles.modalInputContainerIcon}
+                    onPress={() => {
+                      if (editingCommentId) handleSaveEditComment();
+                      else handleAddComment(textInput);
+                    }}
+                  />
+                </View>
+              </KeyboardAvoidingView>
             )}
-          </View>
-        ) : (
-          <KeyboardAvoidingView behavior="padding">
-            <View style={styles.modalInputContainerIOS}>
-              <TextInput
-                placeholder="Digite o comentário..."
-                maxLength={100}
-                value={textInput}
-                onChangeText={(text) => setTextInput(text)}
-                mode="outlined"
-                returnKeyType="done"
-                ref={commentInput}
-              />
-              <IconButton
-                size={22}
-                icon="check"
-                style={styles.modalInputContainerIcon}
-                onPress={() => {
-                  if (editingCommentId) handleSaveEditComment();
-                  else handleAddComment(textInput);
-                }}
-              />
-            </View>
-          </KeyboardAvoidingView>
+          </>
         )}
       </Modal>
     </Portal>

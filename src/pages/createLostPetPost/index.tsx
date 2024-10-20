@@ -37,7 +37,7 @@ export const CreateLostPetPost = () => {
   const [petDescription, setPetDescription] = useState<string>(editingPost?.pet.description);
   const [showPicker, setShowPicker] = useState(false);
 
-  const [userContact, setUserContact] = useState(loggedUser.contacts);
+  const [userContact, setUserContact] = useState(loggedUser?.contacts ?? []);
   const [editingIndex, setEditingIndex] = useState<any>(null);
   const [tempData, setTempData] = useState({
     description: '',
@@ -68,7 +68,7 @@ export const CreateLostPetPost = () => {
       setPetAge('');
       setPetDescription('');
       setSightings([]);
-      setUserContact(loggedUser.contacts);
+      setUserContact(loggedUser?.contacts);
     }
   }, [tabIndex]);
 
@@ -184,7 +184,7 @@ export const CreateLostPetPost = () => {
             <TextInput
               ref={contactInput}
               style={styles.input}
-              value={userContact[0].content ?? loggedUser.contacts[0].content}
+              value={userContact[0].content ?? loggedUser?.contacts[0].content}
               onChangeText={(text) => {
                 let formattedText = text.replace(/\D/g, '');
 
@@ -213,7 +213,7 @@ export const CreateLostPetPost = () => {
             <TextInput
               ref={opContactInput}
               style={styles.input}
-              value={userContact[1]?.content ?? loggedUser.contacts[1]?.content}
+              value={userContact[1]?.content ?? loggedUser?.contacts[1]?.content}
               onChangeText={(text) => {
                 let formattedText = text.replace(/\D/g, '');
 

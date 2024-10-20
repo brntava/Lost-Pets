@@ -17,7 +17,7 @@ import { Loading } from '~/components/Loading';
 import { usePetsContext } from '~/context/petsContext';
 
 export const Login = () => {
-  const { handleSubmitLogin } = usePetsContext();
+  const { handleSubmitLogin, setVisitorUser } = usePetsContext();
 
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
@@ -59,7 +59,15 @@ export const Login = () => {
                 <Text style={styles.textButton}>Entrar</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate('createUser')}>
-                <Text style={styles.ButtonCreate}>Ainda não possui uma conta?</Text>
+                <Text style={styles.ButtonCreate}>Cadastre-se</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setVisitorUser(true);
+
+                  navigation.navigate('feed');
+                }}>
+                <Text style={styles.ButtonCreate}>Entrar como visitante</Text>
               </TouchableOpacity>
             </View>
           </View>

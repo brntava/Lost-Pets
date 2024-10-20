@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
   modalTitle: {
     textAlign: 'center',
     fontWeight: 'bold',
-    marginLeft: 40,
+    marginLeft: 35,
   },
   modalCard: {
     marginLeft: 10,

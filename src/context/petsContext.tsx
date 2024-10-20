@@ -70,7 +70,9 @@ type MyContextType = {
   setLoading: (loading: boolean) => void;
   handleSubmitLogin: (user: string, password: string) => void;
   loggedUser: LoggedUser;
-  setLoggedUser: (loggedUser: LoggedUser) => void;
+  setLoggedUser: (loggedUser: LoggedUser | null) => void;
+  visitorUser: boolean;
+  setVisitorUser: (visitorUser: boolean) => void;
   handleRegisterUser: (data: UserRequestBody) => void;
   handleEditMissingPet: (id: string, data: PetTypeRequest) => void;
   handleSearchMissingPet: () => void;
@@ -121,6 +123,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [missingPetPost, setMissingPetPost] = useState([]);
 
   const [loggedUser, setLoggedUser] = useState<any>({});
+  const [visitorUser, setVisitorUser] = useState(false);
 
   const { latitude, longitude, address } = sightingLocation;
 
@@ -185,7 +188,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!autCookie) return;
 
     let newSighting = {
-      user: loggedUser.user,
+      user: loggedUser?.user,
       sightingDate,
       location: {
         latitude,
@@ -269,7 +272,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
-      const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser.contacts);
+      const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser?.contacts);
       console.log('TCL  contactsToUpdate:', contactsToUpdate);
 
       const updateContactPromises = contactsToUpdate?.map((contact: ContactType) => {
@@ -438,6 +441,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setLoading,
         loggedUser,
         setLoggedUser,
+        visitorUser,
+        setVisitorUser,
         handleRegisterUser,
         handleEditMissingPet,
         handleSearchMissingPet,
