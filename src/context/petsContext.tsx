@@ -154,8 +154,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email: 'bruno5@gmail.com',
-        password: '123456',
+        email,
+        password,
       });
 
       const { token, user } = data;
@@ -273,13 +273,16 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser?.contacts);
-      console.log('TCL  contactsToUpdate:', contactsToUpdate);
 
       const updateContactPromises = contactsToUpdate?.map((contact: ContactType) => {
-        return updateContact(contact.id, {
-          type: 0,
-          contact: contact.content,
-        });
+        return updateContact(
+          contact.id,
+          {
+            type: 0,
+            content: contact.content,
+          },
+          token
+        );
       });
 
       const { id } = await addMissingPet(postData, token);

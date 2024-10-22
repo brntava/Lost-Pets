@@ -114,7 +114,7 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
       {petPhoto && (
         <>
           {petPhoto.map((img: any, index: number) => {
-            const imgURL = img.url?.replace('http://localhost:5241', `${baseURL}/`);
+            const imgURL = img.url?.replace('https://localhost:5241', `${baseURL}/`);
 
             return (
               <View style={styles.imageContainer} key={index}>
