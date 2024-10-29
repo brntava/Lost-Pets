@@ -148,6 +148,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                             pet: item.pet,
                             sightings: item.sightings,
                             images: item.images,
+                            contacts: item.user.contacts,
                           },
                         })
                       }

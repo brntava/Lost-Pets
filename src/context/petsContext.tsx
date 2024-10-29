@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
-import { updateContact } from '~/services/Contacts/contacts';
+import { createContact, deleteContact, updateContact } from '~/services/Contacts/contacts';
 import {
   addMissingPet,
   addMissingPetImage,
@@ -154,8 +154,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email,
-        password,
+        email: 'bruno5@gmail.com',
+        password: '123456',
       });
 
       const { token, user } = data;
@@ -272,20 +272,36 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
+      const addMissingPetPromisse = await addMissingPet(postData, token);
+
       const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser?.contacts);
 
-      const updateContactPromises = contactsToUpdate?.map((contact: ContactType) => {
-        return updateContact(
-          contact.id,
-          {
-            type: 0,
-            content: contact.content,
-          },
-          token
-        );
+      const updateContactPromises = contactsToUpdate?.map(async (contact: ContactType) => {
+        if (!contact.id) {
+          return await createContact(
+            {
+              type: 0,
+              content: contact.content,
+            },
+            token
+          );
+        }
+
+        if (contact.content !== '') {
+          return await updateContact(
+            contact.id,
+            {
+              type: 0,
+              content: contact.content,
+            },
+            token
+          );
+        }
       });
 
-      const { id } = await addMissingPet(postData, token);
+      if (data.removedContact?.removed) {
+        await deleteContact(data.removedContact.id, token);
+      }
 
       const uploadPromises = petPhoto?.map(async (photo: any) => {
         const formData = new FormData();
@@ -296,10 +312,10 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           type: photo.type,
         });
 
-        await addMissingPetImage(id, formData, token);
+        await addMissingPetImage(addMissingPetPromisse.id, formData, token);
       });
 
-      await Promise.all([...updateContactPromises, ...uploadPromises]);
+      await Promise.all([addMissingPetPromisse, ...updateContactPromises, ...uploadPromises]);
 
       handleSearchMissingPet();
 
@@ -370,7 +386,36 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
 
-      await editMissingPet(id, body, autCookie);
+      const editMissingPetPromisse = await editMissingPet(id, body, autCookie);
+
+      const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser?.contacts);
+
+      const updateContactPromises = contactsToUpdate?.map(async (contact: ContactType) => {
+        if (!contact.id) {
+          return await createContact(
+            {
+              type: 0,
+              content: contact.content,
+            },
+            autCookie
+          );
+        }
+
+        return await updateContact(
+          contact.id,
+          {
+            type: 0,
+            content: contact.content,
+          },
+          autCookie
+        );
+      });
+
+      if (data.removedContact?.removed) {
+        await deleteContact(data.removedContact.id, autCookie);
+      }
+
+      await Promise.all([editMissingPetPromisse, ...updateContactPromises]);
 
       handleSearchMissingPet();
 

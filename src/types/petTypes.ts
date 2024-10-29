@@ -14,4 +14,10 @@ export interface PetTypeRequest {
   age: string;
   description: string;
   contact?: ContactType[];
+  removedContact?: RemovedContactType;
 }
+
+type RemovedContactType = {
+  removed: boolean;
+  id: string;
+};

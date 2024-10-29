@@ -39,6 +39,13 @@ export const styles = StyleSheet.create({
   modalContainer: {
     paddingTop: 20,
   },
+  labelContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  labelIconsContainer: {
+    flexDirection: 'row',
+  },
   label: {
     fontSize: 16,
     marginBottom: 5,
@@ -113,5 +120,8 @@ export const styles = StyleSheet.create({
     color: '#228c80',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  inputDisabled: {
+    backgroundColor: '#f0f0f0',
   },
 });

@@ -7,9 +7,11 @@ type RequestBody = {
 
 const URL = process.env.URL;
 
-export const createContact = async (body: RequestBody) => {
-  const { data } = await axios.post(`${URL}/api/Contact`, {
-    body,
+export const createContact = async (body: RequestBody, autCookie: string) => {
+  const { data } = await axios.post(`${URL}/api/Contact`, body, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
   });
 
   return data;
@@ -25,6 +27,10 @@ export const updateContact = async (contactId: string, body: RequestBody, autCoo
   return data;
 };
 
-export const deleteContact = async (contactId: string) => {
-  return await axios.delete(`${URL}/api/Contact/${contactId}`);
+export const deleteContact = async (contactId: string, autCookie: string) => {
+  return await axios.delete(`${URL}/api/Contact/${contactId}`, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
+  });
 };
