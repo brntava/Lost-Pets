@@ -25,7 +25,9 @@ export const styles = StyleSheet.create({
   },
   ageUnitContainer: {
     position: 'absolute',
-    right: 40,
+    display: 'flex',
+    flexDirection: 'row',
+    right: 15,
   },
   agePicker: {
     width: 50,
@@ -35,9 +37,13 @@ export const styles = StyleSheet.create({
   },
   ageUnitText: {
     fontSize: 16,
+    marginRight: 5,
   },
   modalContainer: {
-    paddingTop: 20,
+    backgroundColor: '#fff',
+    padding: 20,
+    marginHorizontal: 30,
+    borderRadius: 8,
   },
   labelContainer: {
     flexDirection: 'row',
@@ -123,5 +129,11 @@ export const styles = StyleSheet.create({
   },
   inputDisabled: {
     backgroundColor: '#f0f0f0',
+  },
+  selectButton: {
+    marginTop: 15,
+    backgroundColor: '#228c80',
+    borderRadius: 8,
+    marginHorizontal: 8,
   },
 });

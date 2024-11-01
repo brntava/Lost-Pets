@@ -1,8 +1,12 @@
+import { LoggedUser } from './userTypes';
+
 export interface CommentsType {
   id: string;
   userId: string;
   createdAt: string;
   awnsersTo: string;
-  answers: [] | CommentsType;
+  awnsers: [] | CommentsType[];
   content: string;
+  user: LoggedUser;
+  missingPetId: string;
 }

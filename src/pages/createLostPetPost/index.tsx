@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useRef, RefObject, useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { Card, IconButton, Text } from 'react-native-paper';
+import { Button, Card, Icon, IconButton, Modal, Portal, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from './styles';
@@ -202,18 +202,33 @@ export const CreateLostPetPost = () => {
                 maxLength={2}
                 placeholder="Idade"
               />
-              <TouchableOpacity
-                style={styles.ageUnitContainer}
-                onPress={() => setShowPicker(showPicker)}>
+              <TouchableOpacity style={styles.ageUnitContainer} onPress={() => setShowPicker(true)}>
                 <Text style={styles.ageUnitText}>{ageUnit}</Text>
+                <Icon source="arrow-down-drop-circle-outline" size={18} color="black" />
               </TouchableOpacity>
-              <Picker
-                selectedValue={ageUnit}
-                style={styles.agePicker}
-                onValueChange={(itemValue) => setAgeUnit(itemValue)}>
-                <Picker.Item label="Anos" value="Anos" />
-                <Picker.Item label="Meses" value="Meses" />
-              </Picker>
+              {showPicker && (
+                <Portal>
+                  <Modal
+                    visible={showPicker}
+                    onDismiss={() => setShowPicker(false)}
+                    contentContainerStyle={styles.modalContainer}>
+                    <Picker
+                      selectedValue={ageUnit}
+                      onValueChange={(itemValue) => setAgeUnit(itemValue)}
+                      style={{ height: 180 }}>
+                      <Picker.Item label="Anos" value="Anos" />
+                      <Picker.Item label="Meses" value="Meses" />
+                    </Picker>
+                    <Button
+                      mode="contained"
+                      onPress={() => setShowPicker(false)}
+                      style={styles.selectButton}
+                      icon="check">
+                      Selecionar
+                    </Button>
+                  </Modal>
+                </Portal>
+              )}
             </View>
 
             <View style={styles.labelContainer}>
