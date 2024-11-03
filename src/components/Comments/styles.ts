@@ -26,9 +26,7 @@ export const styles = StyleSheet.create({
     height: '10%',
     position: 'relative',
   },
-  modalInputContainerIOS: {
-    marginBottom: 50,
-  },
+  modalInputContainerIOS: {},
   modalInputContainerIcon: {
     position: 'absolute',
     right: 0,

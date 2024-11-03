@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, ScrollView, Platform, KeyboardAvoidingView, Alert } from 'react-native';
+import { View, ScrollView, Platform, Alert, Keyboard } from 'react-native';
 import {
   Avatar,
   Card,
@@ -37,9 +37,28 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   const [commentId, setCommentId] = useState('');
 
   const commentInput = useRef(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
     if (comments.length === 0) setComments(item.comments);
+
+    const keyboardShowEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const keyboardHideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const keyboardDidShowListener = Keyboard.addListener(keyboardShowEvent, (event) => {
+      setKeyboardHeight(event.endCoordinates.height - 70);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener(keyboardHideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -66,7 +85,21 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
 
       newComment.user = loggedUser;
 
-      setComments([...comments, newComment]);
+      setComments((prevComments: CommentsType[]) => {
+        if (isAwnser) {
+          return prevComments.map((comment: CommentsType) => {
+            if (comment?.id === commentId) {
+              return {
+                ...comment,
+                awnsers: [...(comment.awnsers || []), newComment],
+              };
+            }
+            return comment;
+          });
+        } else {
+          return [...prevComments, newComment];
+        }
+      });
       setCommentId('');
       setTextInput('');
       setIsAwnser(false);
@@ -76,8 +109,6 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   };
 
   const handleDeleteComment = async (id: string, awnserId?: string) => {
-    // ARRUMAR UPDATE DOS COMENTARIOS
-
     Alert.alert('', 'Tem certeza que deseja excluir?', [
       {
         text: 'Cancelar',
@@ -94,7 +125,21 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
 
             await deleteComment(awnserId ?? id, autCookie);
 
-            setComments(comments.filter((comment) => comment.id !== id));
+            setComments((prevComments: CommentsType[]) => {
+              if (awnserId) {
+                return prevComments.map((comment) => {
+                  if (comment.id === id) {
+                    return {
+                      ...comment,
+                      awnsers: comment.awnsers.filter((awnser) => awnser.id !== awnserId),
+                    };
+                  }
+                  return comment;
+                });
+              } else {
+                return prevComments.filter((comment) => comment.id !== id);
+              }
+            });
             setTextInput('');
           } catch (err) {
             console.error(`Erro ${err.response?.data}`);
@@ -107,7 +152,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   const handleEditComment = (id: string, awnserId?: string) => {
     commentInput.current.focus();
 
-    const commentToEdit = comments.find((comment) => comment.id === id);
+    const commentToEdit = comments.find((comment: CommentsType) => comment.id === id);
 
     if (commentToEdit && !awnserId) {
       setEditingCommentId(id);
@@ -156,7 +201,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
       if (!autCookie) return;
 
       await updateComment(
-        commentAwnser?.id === '' ? editingCommentId : commentAwnser.id,
+        !commentAwnser?.id ? editingCommentId : commentAwnser.id,
         body,
         autCookie
       );
@@ -183,8 +228,9 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
             Comentários
           </Text>
         </View>
-        <View style={styles.modalCardContainer}>
-          <ScrollView>
+        <View
+          style={[styles.modalCardContainer, visitorUser ? { paddingTop: 0, height: '90%' } : {}]}>
+          <ScrollView ref={scrollViewRef}>
             {comments.length > 0 &&
               comments.map((comment: CommentsType, index: number) => {
                 const isUserComment = comment.user.id === loggedUser?.id;
@@ -192,7 +238,15 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                 if (comment.missingPetId === item.id) {
                   return (
                     <>
-                      <Card key={index} style={styles.modalCard}>
+                      <Card
+                        key={index}
+                        style={[
+                          styles.modalCard,
+                          visitorUser ? { marginTop: 20 } : {},
+                          visitorUser && comment.awnsers.length === 0
+                            ? { borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }
+                            : {},
+                        ]}>
                         <Card.Title
                           title={comment.user.userName}
                           subtitle={new Date(comment.createdAt).toLocaleString('pt-br', {
@@ -248,14 +302,15 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                             const isUserAwnser = awnser.user.id === loggedUser?.id;
 
                             return (
-                              <View style={styles.answerCommentContainer} key={index}>
+                              <View style={[styles.answerCommentContainer]} key={index}>
                                 <View style={{ marginLeft: 10 }}>
                                   <Icon source="account" size={20} />
                                 </View>
                                 <View style={{ flexDirection: 'column' }}>
                                   <View style={styles.answerCommentHeader}>
                                     <Text style={styles.answerCommentHeaderText}>
-                                      {awnser.user.userName} {' - '}
+                                      {awnser.user.userName}
+                                      {' - '}
                                       {new Date(awnser.createdAt).toLocaleDateString('pt-br')}
                                     </Text>
                                     {isUserAwnser && (
@@ -278,7 +333,11 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                     )}
                                   </View>
                                   <View style={styles.answerCommentContent}>
-                                    <Text style={styles.answerCommentContentText}>
+                                    <Text
+                                      style={[
+                                        styles.answerCommentContentText,
+                                        visitorUser ? { marginTop: 8 } : {},
+                                      ]}>
                                       {editingAwnserCommentId?.commentAwnser.id === awnser.id
                                         ? textInput
                                         : awnser.content}
@@ -290,17 +349,19 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                           })}
                         </>
                       )}
-                      <Chip
-                        icon="chat-processing-outline"
-                        onPress={() => {
-                          setIsAwnser(true);
-                          setCommentId(comment.id);
+                      {!visitorUser && (
+                        <Chip
+                          icon="chat-processing-outline"
+                          onPress={() => {
+                            setIsAwnser(true);
+                            setCommentId(comment.id);
 
-                          commentInput.current.focus();
-                        }}
-                        style={styles.answerCommentChip}>
-                        Responder...
-                      </Chip>
+                            commentInput.current.focus();
+                          }}
+                          style={styles.answerCommentChip}>
+                          Responder...
+                        </Chip>
+                      )}
                     </>
                   );
                 }
@@ -333,7 +394,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                 )}
               </View>
             ) : (
-              <View style={styles.modalInputContainerIOS}>
+              <View style={[styles.modalInputContainerIOS, { bottom: keyboardHeight }]}>
                 <TextInput
                   placeholder="Digite o comentário..."
                   maxLength={100}
@@ -342,6 +403,9 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                   mode="outlined"
                   returnKeyType="done"
                   ref={commentInput}
+                  onFocus={() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                  }}
                 />
                 <IconButton
                   size={22}
@@ -351,6 +415,8 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                     if (editingAwnserCommentId?.commentAwnser.id || editingCommentId !== '')
                       handleSaveEditComment();
                     else handleAddComment(textInput);
+
+                    Keyboard.dismiss();
                   }}
                 />
               </View>
