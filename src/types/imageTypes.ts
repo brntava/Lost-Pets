@@ -1,9 +1,3 @@
-export interface PhotoType {
-  id: string;
-  location: string;
-  content: string;
-}
-
 export interface ImageType {
   assetId: string;
   base64: null | string;
@@ -15,4 +9,11 @@ export interface ImageType {
   type: string;
   uri: string;
   width: number;
+}
+
+export interface PostImageType {
+  url: string;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -11,12 +11,22 @@ const AddPostRoute = () => <CreateLostPetPost />;
 const SearchMapRoute = () => <SearchSighting />;
 
 export const BottomMenu = () => {
-  const { missingPetPost, tabIndex, setTabIndex } = usePetsContext();
-  const [routes] = useState([
+  const { missingPetPost, tabIndex, setTabIndex, visitorUser } = usePetsContext();
+
+  const [routes, setRoutes] = useState([
     { key: 'home', focusedIcon: 'home' },
-    { key: 'addPost', focusedIcon: 'plus' },
     { key: 'search', focusedIcon: 'map-marker' },
   ]);
+
+  useEffect(() => {
+    if (!visitorUser) {
+      setRoutes((prevRoutes) => [
+        { key: 'home', focusedIcon: 'home' },
+        { key: 'addPost', focusedIcon: 'plus' },
+        { key: 'search', focusedIcon: 'map-marker' },
+      ]);
+    }
+  }, [visitorUser]);
 
   const renderScene = BottomNavigation.SceneMap({
     home: HomeRoute,

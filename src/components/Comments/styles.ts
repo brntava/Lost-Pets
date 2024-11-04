@@ -26,9 +26,7 @@ export const styles = StyleSheet.create({
     height: '10%',
     position: 'relative',
   },
-  modalInputContainerIOS: {
-    marginBottom: 50,
-  },
+  modalInputContainerIOS: {},
   modalInputContainerIcon: {
     position: 'absolute',
     right: 0,
@@ -46,7 +44,7 @@ export const styles = StyleSheet.create({
   modalTitle: {
     textAlign: 'center',
     fontWeight: 'bold',
-    marginLeft: 40,
+    marginLeft: 35,
   },
   modalCard: {
     marginLeft: 10,
@@ -58,13 +56,17 @@ export const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   },
+  modalCardAwnser: {
+    backgroundColor: '#fff',
+    marginHorizontal: 10,
+    borderRadius: 0,
+  },
   modalNoComments: {
     height: '100%',
     textAlign: 'center',
   },
-  answerComment: {
-    marginLeft: 10,
-    marginRight: 10,
+  answerCommentChip: {
+    marginHorizontal: 10,
     marginBottom: 20,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -72,5 +74,32 @@ export const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderTopWidth: 0,
     backgroundColor: '#fff',
+  },
+  answerCommentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  answerCommentHeaderText: {
+    fontSize: 12,
+    marginLeft: 20,
+    fontWeight: '500',
+  },
+  answerCommentContent: {
+    marginBottom: 5,
+  },
+  answerCommentContentText: {
+    fontSize: 12,
+    marginLeft: 20,
+  },
+  answerCommentContainer: {
+    marginHorizontal: 10,
+    padding: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: '#ccc',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

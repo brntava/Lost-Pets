@@ -42,13 +42,19 @@ export const CreateUser = () => {
         createdAt: new Date(),
         updatedAt: null,
       },
-      {
-        type: 0,
-        content: opInputPhone,
-        createdAt: new Date(),
-        updatedAt: null,
-      },
     ]);
+
+    if (opInputPhone !== '') {
+      setContacts([
+        ...contacts,
+        {
+          type: 0,
+          content: opInputPhone,
+          createdAt: new Date(),
+          updatedAt: null,
+        },
+      ]);
+    }
   }, [inputPhone, opInputPhone]);
 
   const validateFields = () => {

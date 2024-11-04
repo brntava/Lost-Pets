@@ -11,6 +11,8 @@ type ModalMenuProps = {
 };
 
 export const ModalMenu = ({ visible, closeModal }: ModalMenuProps) => {
+  const { visitorUser, setVisitorUser, setLoggedUser } = usePetsContext();
+
   const navigation = useNavigation();
 
   const handleLogOut = () => {
@@ -25,11 +27,16 @@ export const ModalMenu = ({ visible, closeModal }: ModalMenuProps) => {
         {
           text: 'Sair',
           onPress: () => {
-            deleteUserToken();
+            if (!visitorUser) deleteUserToken();
+
+            setLoggedUser(null);
+            setVisitorUser(false);
+
             navigation.reset({
               index: 0,
               routes: [{ name: 'login' }],
             });
+
             closeModal();
           },
         },

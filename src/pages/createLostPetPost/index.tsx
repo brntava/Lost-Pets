@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useRef, RefObject, useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { Card, IconButton, Text } from 'react-native-paper';
+import { Button, Card, Icon, IconButton, Modal, Portal, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from './styles';
@@ -26,7 +26,9 @@ export const CreateLostPetPost = () => {
   } = usePetsContext();
 
   const routes = useRoute();
+
   const editingPost = routes.params?.editingPost;
+  const petImages = editingPost?.images;
 
   const [petName, setPetName] = useState<string>(editingPost?.pet.name ?? '');
   const [petSpecies, setPetSpecies] = useState<string>(editingPost?.pet.species ?? '');
@@ -35,7 +37,11 @@ export const CreateLostPetPost = () => {
   const [petDescription, setPetDescription] = useState<string>(editingPost?.pet.description);
   const [showPicker, setShowPicker] = useState(false);
 
-  const [userContact, setUserContact] = useState(loggedUser.contacts);
+  const [userContact, setUserContact] = useState(loggedUser?.contacts ?? []);
+  const [editContact, setEditContact] = useState(false);
+  const [editOpContact, setEditOpContact] = useState(false);
+  const [removedContact, setRemovedContact] = useState('');
+
   const [editingIndex, setEditingIndex] = useState<any>(null);
   const [tempData, setTempData] = useState({
     description: '',
@@ -57,6 +63,9 @@ export const CreateLostPetPost = () => {
 
   useEffect(() => {
     if (editingPost) setAgeUnit(petAge.includes('00') ? 'Meses' : ' Anos');
+
+    setRemovedContact('');
+    setUserContact(editingPost?.contacts ?? loggedUser?.contacts);
   }, []);
 
   useEffect(() => {
@@ -65,8 +74,10 @@ export const CreateLostPetPost = () => {
       setPetSpecies('');
       setPetAge('');
       setPetDescription('');
+      setRemovedContact('');
       setSightings([]);
-      setUserContact(loggedUser.contacts);
+      setEditContact(false);
+      setEditOpContact(false);
     }
   }, [tabIndex]);
 
@@ -91,6 +102,11 @@ export const CreateLostPetPost = () => {
       species: petSpecies,
       age: ageUnit === 'Meses' ? `00${petAge}` : `11${petAge}`,
       description: petDescription,
+      contact: userContact,
+      removedContact: {
+        removed: removedContact !== '',
+        id: removedContact !== '' ? removedContact : '',
+      },
     });
   };
 
@@ -115,6 +131,29 @@ export const CreateLostPetPost = () => {
 
   const handleRemoveSighting = async (index: number) => {
     setSightings(sightings.filter((_, i) => i !== index));
+  };
+
+  const handleEditContact = () => {
+    if (editContact) contactInput.current.focus();
+
+    setEditContact(!editContact);
+  };
+
+  const handleEditOpContact = () => {
+    setEditOpContact(!editOpContact);
+    if (!editOpContact) opContactInput.current.focus();
+  };
+
+  const handleDeleteOpContact = () => {
+    setUserContact((prevContacts) => {
+      const updatedContacts = [...prevContacts];
+
+      updatedContacts[1].content = '';
+
+      setRemovedContact(updatedContacts[1].id);
+
+      return updatedContacts;
+    });
   };
 
   return (
@@ -163,25 +202,49 @@ export const CreateLostPetPost = () => {
                 maxLength={2}
                 placeholder="Idade"
               />
-              <TouchableOpacity
-                style={styles.ageUnitContainer}
-                onPress={() => setShowPicker(showPicker)}>
+              <TouchableOpacity style={styles.ageUnitContainer} onPress={() => setShowPicker(true)}>
                 <Text style={styles.ageUnitText}>{ageUnit}</Text>
+                <Icon source="arrow-down-drop-circle-outline" size={18} color="black" />
               </TouchableOpacity>
-              <Picker
-                selectedValue={ageUnit}
-                style={styles.agePicker}
-                onValueChange={(itemValue) => setAgeUnit(itemValue)}>
-                <Picker.Item label="Anos" value="Anos" />
-                <Picker.Item label="Meses" value="Meses" />
-              </Picker>
+              {showPicker && (
+                <Portal>
+                  <Modal
+                    visible={showPicker}
+                    onDismiss={() => setShowPicker(false)}
+                    contentContainerStyle={styles.modalContainer}>
+                    <Picker
+                      selectedValue={ageUnit}
+                      onValueChange={(itemValue) => setAgeUnit(itemValue)}
+                      style={{ height: 180 }}>
+                      <Picker.Item label="Anos" value="Anos" />
+                      <Picker.Item label="Meses" value="Meses" />
+                    </Picker>
+                    <Button
+                      mode="contained"
+                      onPress={() => setShowPicker(false)}
+                      style={styles.selectButton}
+                      icon="check">
+                      Selecionar
+                    </Button>
+                  </Modal>
+                </Portal>
+              )}
             </View>
 
-            <Text style={styles.label}>Contato</Text>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>Contato</Text>
+              <TouchableOpacity onPress={handleEditContact}>
+                <IconButton
+                  icon={editContact ? 'check' : 'pencil'}
+                  size={17}
+                  style={{ paddingTop: 10 }}
+                />
+              </TouchableOpacity>
+            </View>
             <TextInput
               ref={contactInput}
-              style={styles.input}
-              value={userContact[0].content ?? loggedUser.contacts[0].content}
+              style={[styles.input, !editContact ? styles.inputDisabled : {}]}
+              value={userContact[0].content ?? loggedUser?.contacts[0].content}
               onChangeText={(text) => {
                 let formattedText = text.replace(/\D/g, '');
 
@@ -205,12 +268,29 @@ export const CreateLostPetPost = () => {
               returnKeyType="next"
               maxLength={15}
               placeholder="Contato"
+              editable={editContact}
             />
-            <Text style={styles.label}>Contato Opcional</Text>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>Contato Opcional</Text>
+              <View style={styles.labelIconsContainer}>
+                <TouchableOpacity onPress={handleEditOpContact}>
+                  <IconButton
+                    icon={editOpContact ? 'check' : 'pencil'}
+                    size={17}
+                    style={{ paddingTop: 10 }}
+                  />
+                </TouchableOpacity>
+                {userContact[1]?.content ? (
+                  <TouchableOpacity onPress={handleDeleteOpContact}>
+                    <IconButton icon="trash-can" size={17} style={{ paddingTop: 10 }} />
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
             <TextInput
               ref={opContactInput}
-              style={styles.input}
-              value={userContact[1].content ?? loggedUser.contacts[1].content}
+              style={[styles.input, !editOpContact ? styles.inputDisabled : {}]}
+              value={userContact[1]?.content ?? loggedUser?.contacts[1]?.content}
               onChangeText={(text) => {
                 let formattedText = text.replace(/\D/g, '');
 
@@ -234,6 +314,7 @@ export const CreateLostPetPost = () => {
               returnKeyType="next"
               maxLength={15}
               placeholder="Contato opcional"
+              editable={editOpContact}
             />
             <Text style={styles.label}>Descrição</Text>
             <TextInput
@@ -322,7 +403,11 @@ export const CreateLostPetPost = () => {
                   })}
               </>
             )}
-            <ImagePickerScreen />
+            <ImagePickerScreen
+              isEditing={!!editingPost}
+              petId={editingPost?.id}
+              editingImages={petImages}
+            />
             <TouchableOpacity
               style={styles.submitButton}
               onPress={() => {
@@ -335,6 +420,11 @@ export const CreateLostPetPost = () => {
                           ? `00${petAge.includes('00') ? petAge.replace('00', '') : petAge.replace('11', '')}`
                           : `11${petAge.includes('11') ? petAge.replace('11', '') : petAge.replace('00', '')}`,
                       description: petDescription,
+                      contact: userContact,
+                      removedContact: {
+                        removed: removedContact !== '',
+                        id: removedContact !== '' ? removedContact : '',
+                      },
                     })
                   : handleSubmit();
               }}>

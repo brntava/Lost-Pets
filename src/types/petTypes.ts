@@ -1,11 +1,10 @@
-import { PhotoType } from './photoTypes';
+import { ContactType } from './contactTypes';
 
 export interface PetType {
   id: string;
   name: string;
   species: string;
   age: string;
-  photos: PhotoType[];
   description: string;
 }
 
@@ -13,6 +12,12 @@ export interface PetTypeRequest {
   name: string;
   species: string;
   age: string;
-  photos?: PhotoType[];
   description: string;
+  contact?: ContactType[];
+  removedContact?: RemovedContactType;
 }
+
+type RemovedContactType = {
+  removed: boolean;
+  id: string;
+};

@@ -1,15 +1,24 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
-import { addMissingPet, editMissingPet, getMissingPet } from '~/services/MissingPets/missingPets';
+import { createContact, deleteContact, updateContact } from '~/services/Contacts/contacts';
+import {
+  addMissingPet,
+  addMissingPetImage,
+  deleteMissingPetImage,
+  editMissingPet,
+  getMissingPet,
+} from '~/services/MissingPets/missingPets';
 import { createSighthing, deleteSighthing } from '~/services/MissingPets/sighthings';
 import { loginUser, registerUser } from '~/services/Users/users';
 import { CommentsType } from '~/types/commentTypes';
+import { ContactType } from '~/types/contactTypes';
 import { LocationType } from '~/types/locationTypes';
 import { PetTypeRequest } from '~/types/petTypes';
 import { ImageType } from '~/types/photoTypes';
 import { SighthingType } from '~/types/sighthingTypes';
 import { LoggedUser, LoginResponse, UserRequestBody } from '~/types/userTypes';
+import { findUpdatedContacts } from '~/utils/findUpdatedContacts';
 import { getUserToken } from '~/utils/getUserToken';
 import { saveUserToken } from '~/utils/saveUserToken';
 
@@ -61,12 +70,18 @@ type MyContextType = {
   setLoading: (loading: boolean) => void;
   handleSubmitLogin: (user: string, password: string) => void;
   loggedUser: LoggedUser;
-  setLoggedUser: (loggedUser: LoggedUser) => void;
+  setLoggedUser: (loggedUser: LoggedUser | null) => void;
+  visitorUser: boolean;
+  setVisitorUser: (visitorUser: boolean) => void;
   handleRegisterUser: (data: UserRequestBody) => void;
   handleEditMissingPet: (id: string, data: PetTypeRequest) => void;
   handleSearchMissingPet: () => void;
   postSightings: any;
   setPostSightings: (postSightings: any) => void;
+  editingAddPetPhoto: any;
+  setEditingAddPetPhoto: (editingAddPetPhoto: any) => void;
+  editingRemovePetPhoto: any;
+  setEditingRemovePetPhoto: (editingRemovePetPhoto: any) => void;
 };
 
 const PetsContext = createContext<MyContextType | undefined>(undefined);
@@ -97,6 +112,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     address: '',
   });
   const [petPhoto, setPetPhoto] = useState<any>([]);
+  const [editingAddPetPhoto, setEditingAddPetPhoto] = useState<any>({});
+  const [editingRemovePetPhoto, setEditingRemovePetPhoto] = useState<any>({});
   const [missingPetContact, setMissingPetContact] = useState('');
   const [postSightings, setPostSightings] = useState<any>([]);
 
@@ -105,6 +122,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [sightings, setSightings] = useState<SighthingType[]>([]);
   const [missingPetPost, setMissingPetPost] = useState([]);
   const [loggedUser, setLoggedUser] = useState<any>({});
+  const [visitorUser, setVisitorUser] = useState(false);
 
   const { latitude, longitude, address } = sightingLocation;
 
@@ -124,7 +142,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       setLoading(false);
 
-      alert('Ocorreu um erro inesperado');
+      alert(`Ocorreu um erro inesperado: ${err.response?.data}`);
 
       throw new Error(`Error ${err}`);
     }
@@ -135,8 +153,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email,
-        password,
+        email: 'bruno5@gmail.com',
+        password: '123456',
       });
 
       const { token, user } = data;
@@ -148,8 +166,10 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         index: 0,
         routes: [{ name: 'feed' }],
       });
-    } catch {
+    } catch (err) {
       alert('Usúario ou senha incorreta');
+
+      console.log(err);
       return;
     } finally {
       setLoading(false);
@@ -167,7 +187,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!autCookie) return;
 
     let newSighting = {
-      user: loggedUser.user,
+      user: loggedUser?.user,
       sightingDate,
       location: {
         latitude,
@@ -219,6 +239,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       data.species === '' ||
       data.description === '' ||
       sightings.length === 0
+      // petPhoto.length === 0
     ) {
       alert('É necessário preencher todos os campos informados e pelos menos um avistamento');
       return;
@@ -238,11 +259,6 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         name: data.name,
         species: data.species,
         age: data.age,
-        photos: petPhoto.map((photo: ImageType, index: number) => ({
-          id: index.toString(),
-          location: photo.uri,
-          content: '',
-        })),
         description: data.description,
       },
       status: 0,
@@ -255,12 +271,55 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
-    await addMissingPet(postData, token);
+      const addMissingPetPromisse = await addMissingPet(postData, token);
+
+      const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser?.contacts);
+
+      const updateContactPromises = contactsToUpdate?.map(async (contact: ContactType) => {
+        if (!contact.id) {
+          return await createContact(
+            {
+              type: 0,
+              content: contact.content,
+            },
+            token
+          );
+        }
+
+        if (contact.content !== '') {
+          return await updateContact(
+            contact.id,
+            {
+              type: 0,
+              content: contact.content,
+            },
+            token
+          );
+        }
+      });
+
+      if (data.removedContact?.removed) {
+        await deleteContact(data.removedContact.id, token);
+      }
+
+      const uploadPromises = petPhoto?.map(async (photo: any) => {
+        const formData = new FormData();
+
+        formData.append('formFiles', {
+          uri: photo.uri,
+          name: photo.fileName || 'name',
+          type: photo.type,
+        });
+
+        await addMissingPetImage(addMissingPetPromisse.id, formData, token);
+      });
+
+      await Promise.all([addMissingPetPromisse, ...updateContactPromises, ...uploadPromises]);
+
+      handleSearchMissingPet();
 
       setPetPhoto([]);
       setMissingPetContact('');
-
-      handleSearchMissingPet();
 
       setLoading(false);
       setTabIndex(0);
@@ -268,10 +327,6 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error:', err);
 
       setLoading(false);
-
-      return {
-        error: err,
-      };
     }
   };
 
@@ -291,6 +346,12 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       }
 
+      if (petPhoto.length === 0) {
+        alert('É necessário pelo menos uma foto');
+
+        return;
+      }
+
       const body = {
         pet: {
           id,
@@ -304,17 +365,69 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       setLoading(true);
 
-      await editMissingPet(id, body, autCookie);
+      if (editingRemovePetPhoto) {
+        if (editingRemovePetPhoto.removed?.length > 0) {
+          for (const { petId, imageId } of editingRemovePetPhoto.removed) {
+            await deleteMissingPetImage(petId, imageId, autCookie);
+          }
+
+          setEditingRemovePetPhoto({ removed: [] });
+        }
+      }
+
+      if (editingAddPetPhoto) {
+        if (editingAddPetPhoto.added?.length > 0) {
+          for (const { petId, formData } of editingAddPetPhoto.added) {
+            await addMissingPetImage(petId, formData, autCookie);
+          }
+
+          setEditingAddPetPhoto({ added: [] });
+        }
+      }
+
+      const editMissingPetPromisse = await editMissingPet(id, body, autCookie);
+
+      const contactsToUpdate = findUpdatedContacts(data.contact ?? [], loggedUser?.contacts);
+
+      const updateContactPromises = contactsToUpdate?.map(async (contact: ContactType) => {
+        if (!contact.id) {
+          return await createContact(
+            {
+              type: 0,
+              content: contact.content,
+            },
+            autCookie
+          );
+        }
+
+        return await updateContact(
+          contact.id,
+          {
+            type: 0,
+            content: contact.content,
+          },
+          autCookie
+        );
+      });
+
+      if (data.removedContact?.removed) {
+        await deleteContact(data.removedContact.id, autCookie);
+      }
+
+      await Promise.all([editMissingPetPromisse, ...updateContactPromises]);
 
       handleSearchMissingPet();
+
+      setPetPhoto([]);
 
       setLoading(false);
 
       navigation.navigate('feed');
     } catch (err) {
+      setPetPhoto([]);
       setLoading(false);
 
-      console.error('Error:', err.response?.data.errors);
+      console.error('Error:', err);
     }
   };
 
@@ -375,11 +488,17 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setLoading,
         loggedUser,
         setLoggedUser,
+        visitorUser,
+        setVisitorUser,
         handleRegisterUser,
         handleEditMissingPet,
         handleSearchMissingPet,
         postSightings,
         setPostSightings,
+        editingAddPetPhoto,
+        setEditingAddPetPhoto,
+        editingRemovePetPhoto,
+        setEditingRemovePetPhoto,
       }}>
       {children}
     </PetsContext.Provider>

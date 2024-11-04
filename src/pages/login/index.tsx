@@ -17,7 +17,7 @@ import { Loading } from '~/components/Loading';
 import { usePetsContext } from '~/context/petsContext';
 
 export const Login = () => {
-  const { handleSubmitLogin } = usePetsContext();
+  const { handleSubmitLogin, setVisitorUser } = usePetsContext();
 
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
@@ -26,43 +26,53 @@ export const Login = () => {
 
   return (
     <>
-      {loading && (
-        <ActivityIndicator animating color="#fff" size={50} style={styles.loadingButton} />
-      )}
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.Container}>
-          <View style={styles.UserImage}>
-            <Image source={require('../../../assets/paw-pet-login.png')} style={styles.Image} />
+      <Loading />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={styles.Container}>
+            <View style={styles.UserImage}>
+              <Image source={require('../../../assets/paw-pet-login.png')} style={styles.Image} />
+            </View>
+            <Text style={styles.title}>Lost Pets</Text>
+            <View style={styles.form}>
+              <TextInput
+                style={styles.inputEmail}
+                placeholder="Email"
+                autoCapitalize="none"
+                placeholderTextColor="#000"
+                onChangeText={(text) => setUserEmail(text)}
+              />
+              <TextInput
+                style={styles.inputPassword}
+                placeholder="Senha"
+                autoCapitalize="none"
+                autoCorrect
+                placeholderTextColor="#000"
+                onChangeText={(text) => setUserPassword(text)}
+                secureTextEntry
+              />
+              <TouchableOpacity
+                style={styles.buttonForm}
+                onPress={() => handleSubmitLogin(userEmail, userPassword)}>
+                <Text style={styles.textButton}>Entrar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('createUser')}>
+                <Text style={styles.ButtonCreate}>Cadastre-se</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setVisitorUser(true);
+
+                  navigation.navigate('feed');
+                }}>
+                <Text style={styles.ButtonCreate}>Entrar como visitante</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.form}>
-            <TextInput
-              style={styles.inputEmail}
-              placeholder="Email"
-              autoCompleteType="email"
-              autoCapitalize="none"
-              placeholderTextColor="#000"
-              onChangeText={(text) => setUserEmail(text)}
-            />
-            <TextInput
-              style={styles.inputPassword}
-              placeholder="Senha"
-              autoCompleteType="password"
-              autoCapitalize="none"
-              autoCorrect
-              placeholderTextColor="#000"
-              onChangeText={(text) => setUserPassword(text)}
-            />
-            <TouchableOpacity
-              style={styles.buttonForm}
-              onPress={() => handleSubmitLogin(userEmail, userPassword)}>
-              <Text style={styles.textButton}>Entrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('createUser')}>
-              <Text style={styles.ButtonCreate}>Ainda não possui uma conta?</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 };
