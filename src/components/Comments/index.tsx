@@ -273,7 +273,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                     <IconButton
                                       {...props}
                                       icon="pencil"
-                                      size={15}
+                                      size={13}
                                       style={{ paddingLeft: 10 }}
                                       onPress={() => handleEditComment(comment.id)}
                                     />
@@ -281,7 +281,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                   <IconButton
                                     {...props}
                                     icon="trash-can-outline"
-                                    size={15}
+                                    size={13}
                                     style={{ paddingRight: 10 }}
                                     onPress={() => handleDeleteComment(comment.id)}
                                   />
@@ -326,7 +326,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                         <IconButton
                                           icon="trash-can-outline"
                                           size={12}
-                                          style={{ paddingRight: 10 }}
+                                          style={{ paddingRight: 15 }}
                                           onPress={() => handleDeleteComment(comment.id, awnser.id)}
                                         />
                                       </View>

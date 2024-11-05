@@ -62,7 +62,17 @@ const Routes = () => {
         component={SightingModal}
         options={{
           headerShown: true,
-          headerTitle: 'Voltar',
+          headerTitle: '',
+          headerBackTitle: 'Voltar',
+          headerTintColor: '#000',
+          headerRight: () => (
+            <View style={styles.menuLogoContainer}>
+              <Image
+                style={styles.menuLogoImage}
+                source={require('../../assets/paw-pet-login.png')}
+              />
+            </View>
+          ),
         }}
       />
       <Stack.Screen
@@ -70,7 +80,17 @@ const Routes = () => {
         component={SearchSighting}
         options={{
           headerShown: true,
-          headerTitle: 'Voltar',
+          headerTitle: '',
+          headerBackTitle: 'Voltar',
+          headerTintColor: '#1d1a1a',
+          headerRight: () => (
+            <View style={styles.menuLogoContainer}>
+              <Image
+                style={styles.menuLogoImage}
+                source={require('../../assets/paw-pet-login.png')}
+              />
+            </View>
+          ),
         }}
       />
     </Stack.Navigator>
