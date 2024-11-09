@@ -4,34 +4,34 @@ export const styles = StyleSheet.create({
   modalContainer: {
     justifyContent: 'center',
     alignItems: 'flex-end',
-    height: '100vh',
+    height: '100%',
   },
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
+    paddingTop: 60,
     width: '100%',
-    height: '100vh',
+    height: '100%',
   },
   modalHeader: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 50,
   },
   menuTitle: {
     fontSize: 32,
     fontWeight: 'bold',
     color: 'black',
   },
-  closeButton: {
+  closeButtonContainer: {
     justifyContent: 'center',
     alignItems: 'flex-end',
-    borderWidth: 0,
     height: 180,
+    width: '100%',
   },
-  closeButtonImg: {
-    width: 50,
-    height: 50,
+  closeButton: {
+    paddingRight: 10,
   },
   menuItems: {
     marginBottom: 10,

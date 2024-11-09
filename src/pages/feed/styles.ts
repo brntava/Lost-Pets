@@ -6,17 +6,33 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 15,
   },
-  notFoundcontainer: {
-    flex: 1,
-    display: 'flex',
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  notFoundContainer: {
+    height: 550,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notFoundText: {
+  notFoundTextContainer: {
+    width: 360,
+    justifyContent: 'center',
+  },
+  notFoundTitle: {
     fontWeight: 'bold',
     fontSize: 22,
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: 15,
+    marginBottom: 20,
+  },
+  notFoundText: {
+    fontSize: 18,
+    marginLeft: 15,
+    marginBottom: 20,
+    lineHeight: 30,
   },
   addPublicationButton: {
     position: 'absolute',
@@ -40,5 +56,10 @@ export const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     backgroundColor: '#ededed',
+  },
+  feedMapLocationModal: {
+    borderRadius: 5,
+    marginHorizontal: 12,
+    height: 50,
   },
 });

@@ -238,8 +238,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       data.age === null ||
       data.species === '' ||
       data.description === '' ||
-      sightings.length === 0
-      // petPhoto.length === 0
+      sightings.length === 0 ||
+      petPhoto.length === 0
     ) {
       alert('É necessário preencher todos os campos informados e pelos menos um avistamento');
       return;
@@ -432,7 +432,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const handleSearchMissingPet = async () => {
-    const data = (await getMissingPet(feedLocation.lat, feedLocation.lng, 10000000)) as any;
+    const data = (await getMissingPet(feedLocation.lat, feedLocation.lng, 50)) as any;
 
     setMissingPetPost(data ?? []);
   };

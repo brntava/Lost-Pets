@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, Modal, Image, Alert } from 'react-native';
+
 import { styles } from './styles';
 
 import { usePetsContext } from '~/context/petsContext';
@@ -49,12 +50,14 @@ export const ModalMenu = ({ visible, closeModal }: ModalMenuProps) => {
     <Modal animationType="slide" visible={visible} onRequestClose={closeModal}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-            <Image
-              style={styles.closeButtonImg}
-              source={require('../../../assets/close-icon.png')}
+          <View style={styles.closeButtonContainer}>
+            <IconButton
+              icon="close"
+              size={35}
+              onPress={() => closeModal()}
+              style={styles.closeButton}
             />
-          </TouchableOpacity>
+          </View>
           <View style={styles.modalHeader}>
             <Text style={styles.menuTitle}>Menu</Text>
           </View>
@@ -69,10 +72,7 @@ export const ModalMenu = ({ visible, closeModal }: ModalMenuProps) => {
               <Text style={styles.menuItemText}>Configurações</Text>
             </TouchableOpacity>
             <View style={styles.bar} />
-            <TouchableOpacity
-              style={[styles.menuItem, styles.logoutButton]}
-              onPress={handleLogOut}
-            >
+            <TouchableOpacity style={[styles.menuItem, styles.logoutButton]} onPress={handleLogOut}>
               <Text style={[styles.menuItemText, styles.logoutButtonText]}>Sair</Text>
             </TouchableOpacity>
           </View>

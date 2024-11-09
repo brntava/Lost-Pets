@@ -66,4 +66,16 @@ export const styles = StyleSheet.create({
     marginLeft: 5,
     paddingBottom: 2,
   },
+  modalContainer: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    margin: 20,
+    borderRadius: 10,
+  },
+  modalButtonContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
 });

@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { TouchableOpacity, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Icon, IconButton, Text } from 'react-native-paper';
+import { Button, Icon, IconButton, Modal, Portal, Text } from 'react-native-paper';
 
 import { styles } from './styles';
 
@@ -22,6 +22,7 @@ export const SightingModal = () => {
   } = usePetsContext();
 
   const [date, setDate] = useState(new Date());
+  const [tempDate, setTempDate] = useState<any>();
   const [showDate, setShowDate] = useState(false);
 
   const navigation = useNavigation<SearchSightingNavigationProp>();
@@ -30,12 +31,12 @@ export const SightingModal = () => {
   const isPost = routes.params?.isPost as boolean;
   const missingPetId = routes.params?.missingPetId as string;
 
-  const handleSightingDate = (event: any, selectedDate: any) => {
-    const currentDate = selectedDate || date.toLocaleDateString('pt-br');
+  const handleSightingDate = () => {
+    const currentDate = tempDate || date.toLocaleDateString('pt-br');
 
-    setShowDate(false);
     setDate(currentDate);
     setSightingDate(currentDate);
+    setShowDate(false);
   };
 
   return (
@@ -50,12 +51,36 @@ export const SightingModal = () => {
           <Icon source="calendar-month" size={18} />
         </TouchableOpacity>
         {showDate && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={handleSightingDate}
-          />
+          <Portal>
+            <Modal
+              visible={showDate}
+              dismissable={false}
+              contentContainerStyle={styles.modalContainer}>
+              <DateTimePicker
+                value={date}
+                display="spinner"
+                locale="pt-br"
+                onChange={(_, date) => setTempDate(date)}
+              />
+              <View style={styles.modalButtonContainer}>
+                <Button
+                  textColor="#FF0000"
+                  style={{ marginRight: 16 }}
+                  labelStyle={{ fontWeight: 'bold' }}
+                  onPress={() => setShowDate(false)}>
+                  Cancelar
+                </Button>
+                <Button
+                  mode="contained"
+                  buttonColor="#228c80"
+                  labelStyle={{ fontWeight: 'bold' }}
+                  style={{ borderRadius: 8 }}
+                  onPress={handleSightingDate}>
+                  Selecionar
+                </Button>
+              </View>
+            </Modal>
+          </Portal>
         )}
         <Text style={styles.label}>Descrição do Avistamento</Text>
         <TextInput
