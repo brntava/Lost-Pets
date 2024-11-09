@@ -48,8 +48,14 @@ export const MyProfile = () => {
       </View>
       <View style={styles.userInfoContent}>
         <Text style={styles.userInfoLabel}>Contato:</Text>
-        <Text style={styles.userInfoValue}>{loggedUser.contacts[0]?.content || 'Sem contato'}</Text>
+        <Text style={styles.userInfoValue}>{loggedUser.contacts[0]?.content}</Text>
       </View>
+      {loggedUser.contacts.length > 1 && (
+        <View style={styles.userInfoContent}>
+          <Text style={styles.userInfoLabel}>Contato Opcional:</Text>
+          <Text style={styles.userInfoValue}>{loggedUser.contacts[1]?.content}</Text>
+        </View>
+        )}
       <View style={styles.userInfoContent}>
         <Text style={styles.userInfoLabel}>Minhas publicações</Text>
         {missingPetPost && missingPetPost.length > 0 ? (
