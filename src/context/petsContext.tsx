@@ -121,7 +121,6 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [sightings, setSightings] = useState<SighthingType[]>([]);
   const [missingPetPost, setMissingPetPost] = useState([]);
-
   const [loggedUser, setLoggedUser] = useState<any>({});
   const [visitorUser, setVisitorUser] = useState(false);
 
@@ -154,8 +153,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email: 'bruno5@gmail.com',
-        password: '123456',
+        email,
+        password,
       });
 
       const { token, user } = data;
