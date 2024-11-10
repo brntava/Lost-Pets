@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, Modal, Image, Alert } from 'react-native';
+import { IconButton } from 'react-native-paper';
 
 import { styles } from './styles';
 
@@ -62,16 +63,14 @@ export const ModalMenu = ({ visible, closeModal }: ModalMenuProps) => {
             <Text style={styles.menuTitle}>Menu</Text>
           </View>
           <View style={styles.menuItems}>
-            <TouchableOpacity style={styles.menuItem} onPress={() => {
-              closeModal()
-              navigation.navigate('MyProfile')}
-            } >
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                closeModal();
+                navigation.navigate('MyProfile');
+              }}>
               <Text style={styles.menuItemText}>Perfil</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Text style={styles.menuItemText}>Configurações</Text>
-            </TouchableOpacity>
-            <View style={styles.bar} />
             <TouchableOpacity style={[styles.menuItem, styles.logoutButton]} onPress={handleLogOut}>
               <Text style={[styles.menuItemText, styles.logoutButtonText]}>Sair</Text>
             </TouchableOpacity>

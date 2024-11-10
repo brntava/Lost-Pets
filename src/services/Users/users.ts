@@ -1,12 +1,6 @@
 import axios from 'axios';
 
-import { LoginResponse, UserLoginBody, UserRequestBody } from '~/types/userTypes';
-
-type RequestConfig = {
-  method: string;
-  url: string;
-  data?: object;
-};
+import { LoggedUser, LoginResponse, UserLoginBody, UserRequestBody } from '~/types/userTypes';
 
 const URL = process.env.URL;
 
@@ -29,15 +23,8 @@ export const loginUser = async (body: UserLoginBody) => {
   };
 };
 
-export const getUser = async (id: string, method: string, body?: UserRequestBody) => {
-  const config: RequestConfig = {
-    method,
-    url: `/user/${id}`,
-  };
-
-  if (body) config.data = body;
-
-  const { data } = await axios(config);
+export const getUser = async (id: string) => {
+  const { data } = await axios.get<Promise<LoggedUser>>(`${URL}/api/User/${id}`);
 
   if (!data) return;
 

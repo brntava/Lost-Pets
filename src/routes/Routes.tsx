@@ -7,9 +7,9 @@ import { CreateUser } from '../pages/createUser';
 import { Login } from '../pages/login';
 
 import { BottomMenu } from '~/components/BottomMenu';
+import { MyProfile } from '~/pages/myProfile';
 import { SearchSighting } from '~/pages/searchSighting';
 import { SightingModal } from '~/pages/sightingModal';
-import MyProfile from '~/pages/myProfile';
 
 const Stack = createStackNavigator();
 
@@ -93,13 +93,15 @@ const Routes = () => {
             </View>
           ),
         }}
-        />
-        <Stack.Screen
+      />
+      <Stack.Screen
         name="MyProfile"
         component={MyProfile}
         options={{
           headerShown: true,
-          headerTitle: 'Voltar',
+          headerTitle: 'Perfil',
+          headerBackTitle: 'Voltar',
+          headerTintColor: '#1d1a1a',
         }}
       />
     </Stack.Navigator>
