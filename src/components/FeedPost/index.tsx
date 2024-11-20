@@ -1,7 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { View, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
-import { Avatar, Card, IconButton, Text, Chip, Portal, Modal, Icon } from 'react-native-paper';
+import {
+  Avatar,
+  Card,
+  IconButton,
+  Text,
+  Chip,
+  Portal,
+  Modal,
+  Icon,
+  Menu,
+} from 'react-native-paper';
 
 import { styles } from './styles';
 import { Comments } from '../Comments';
@@ -23,8 +33,14 @@ type FeedPostProps = {
 const URL = process.env.URL;
 
 export const FeedPost = ({ item, index }: FeedPostProps) => {
-  const { handleRemoveSighting, loggedUser, handleSearchMissingPet, setLoading, visitorUser } =
-    usePetsContext();
+  const {
+    handleRemoveSighting,
+    loggedUser,
+    handleSearchMissingPet,
+    setLoading,
+    visitorUser,
+    userImage,
+  } = usePetsContext();
 
   const petName = item.pet.name;
   const petSpecies = item.pet.species;
@@ -38,6 +54,11 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [imageLoad, setImageLoad] = useState(false);
+
+  const [optionsVisible, setOptionsVisible] = useState(false);
+
+  const openMenu = () => setOptionsVisible(true);
+  const closeMenu = () => setOptionsVisible(false);
 
   const navigation = useNavigation<SightingModalNavigationProp>();
 
@@ -130,18 +151,33 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
             })}
             titleVariant="titleMedium"
             left={(props) => (
-              <Avatar.Icon {...props} icon="account" style={{ backgroundColor: '#ededed' }} />
+              <Avatar.Image
+                {...props}
+                source={{
+                  uri: userImage.uri ?? item.user.image.url.replace('http://localhost:5241', URL),
+                }}
+              />
             )}
             right={(props) => (
               <>
                 {isUserPost && (
-                  <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                    <IconButton
-                      {...props}
-                      icon="pencil"
-                      size={15}
-                      style={{ paddingLeft: 10 }}
-                      onPress={() =>
+                  <Menu
+                    visible={optionsVisible}
+                    onDismiss={closeMenu}
+                    style={{ marginTop: 20 }}
+                    contentStyle={{ backgroundColor: '#fffafa' }}
+                    anchor={
+                      <IconButton
+                        {...props}
+                        icon="dots-vertical"
+                        size={20}
+                        onPress={openMenu}
+                        style={{ paddingRight: 10 }}
+                      />
+                    }>
+                    <Menu.Item
+                      onPress={() => {
+                        closeMenu();
                         navigation.navigate('createLostPetPost', {
                           editingPost: {
                             id: item.id,
@@ -150,18 +186,21 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                             images: item.images,
                             contacts: item.user.contacts,
                           },
-                        })
-                      }
+                        });
+                      }}
+                      title="Editar"
+                      leadingIcon="pencil"
                     />
-
-                    <IconButton
-                      {...props}
-                      icon="trash-can-outline"
-                      size={15}
-                      style={{ paddingRight: 10 }}
-                      onPress={() => handleDelete(item.id)}
+                    <Menu.Item onPress={() => {}} title="Desativar" leadingIcon="eye-off" />
+                    <Menu.Item
+                      onPress={() => {
+                        closeMenu();
+                        handleDelete(item.id);
+                      }}
+                      title="Excluir"
+                      leadingIcon="trash-can-outline"
                     />
-                  </View>
+                  </Menu>
                 )}
               </>
             )}
@@ -198,7 +237,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.cardImgContinainer}>
                 {item.images?.map((image: PostImageType, index: number) => {
-                  const imgURL = image.url.replace('https://localhost:5241', `${URL}/`);
+                  const imgURL = image.url.replace('http://localhost:5241', `${URL}/`);
 
                   return (
                     <TouchableOpacity key={index} onPress={() => openImageModal(imgURL)}>
@@ -254,7 +293,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                 </View>
                 <ScrollView>
                   {item.sightings.map(
-                    ({ sightingDate, description, location, id, user }, index: number) => {
+                    ({ sightingDate, description, location, id, user, address }, index: number) => {
                       const isUserSighting = user.id === loggedUser?.id;
 
                       return (
@@ -262,6 +301,9 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                           <Card.Title
                             title={new Date(sightingDate).toLocaleDateString('pt-br')}
                             titleVariant="titleMedium"
+                            subtitle={address}
+                            subtitleStyle={{ flexWrap: 'wrap', marginBottom: 12 }}
+                            subtitleNumberOfLines={2}
                             right={(props) => (
                               <>
                                 {isUserSighting && (
@@ -291,7 +333,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                                       ]);
                                     }}
                                     style={{ paddingRight: 10 }}
-                                    size={20}
+                                    size={15}
                                   />
                                 )}
                               </>
@@ -301,7 +343,6 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                             <Text style={styles.sightingDescription} variant="bodyMedium">
                               {description}
                             </Text>
-                            <Text variant="bodyMedium">{location?.address}</Text>
                             <View style={styles.sightingLocation}>
                               <SightingMap isModal location={location} />
                             </View>

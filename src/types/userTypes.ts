@@ -1,5 +1,6 @@
 import { CommentsType } from './commentTypes';
 import { ContactType } from './contactTypes';
+import { PostImageType } from './imageTypes';
 import { MissingPetType } from './missingPetTypes';
 import { SighthingType } from './sighthingTypes';
 
@@ -23,6 +24,7 @@ export interface LoginResponse {
 export interface LoggedUser {
   userName: string;
   email: string;
+  image: PostImageType;
   sightings: SighthingType;
   comments: CommentsType;
   missingPets: MissingPetType;

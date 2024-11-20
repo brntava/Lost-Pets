@@ -353,6 +353,9 @@ export const CreateLostPetPost = () => {
                         <Card.Title
                           title={item.sightingDate.toLocaleDateString('pt-br')}
                           titleVariant="titleMedium"
+                          subtitle={item.address}
+                          subtitleStyle={{ flexWrap: 'wrap', marginBottom: 12 }}
+                          subtitleNumberOfLines={2}
                           right={(props) => (
                             <View style={{ flexDirection: 'row' }}>
                               {editingIndex === index ? (
@@ -361,7 +364,7 @@ export const CreateLostPetPost = () => {
                                   icon="check"
                                   onPress={() => handleSave(index, item)}
                                   style={{ paddingLeft: 10 }}
-                                  size={20}
+                                  size={15}
                                 />
                               ) : (
                                 <IconButton
@@ -369,7 +372,7 @@ export const CreateLostPetPost = () => {
                                   icon="pencil"
                                   onPress={() => handleEditToggle(index, item)}
                                   style={{ paddingLeft: 10 }}
-                                  size={20}
+                                  size={15}
                                 />
                               )}
                               <IconButton
@@ -377,7 +380,7 @@ export const CreateLostPetPost = () => {
                                 icon="trash-can-outline"
                                 onPress={() => handleRemoveSighting(index)}
                                 style={{ paddingRight: 10 }}
-                                size={20}
+                                size={15}
                               />
                             </View>
                           )}

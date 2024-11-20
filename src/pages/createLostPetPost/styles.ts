@@ -87,6 +87,7 @@ export const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#ccc',
     marginBottom: 16,
+    paddingTop: 12,
   },
   sightingLocation: {
     marginTop: 10,

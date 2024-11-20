@@ -3,5 +3,4 @@ export interface LocationType {
   longitude: number;
   latitudeDelta?: number;
   longitudeDelta?: number;
-  address?: string;
 }

@@ -7,11 +7,13 @@ export interface SighthingType {
   location: LocationType;
   description: string;
   user: LoggedUser;
+  address: string;
 }
 
 export interface SighthingTypeRequest {
   sightingDate: Date;
   location: LocationType;
+  address: string;
   description: string;
   missingPetId?: string;
 }

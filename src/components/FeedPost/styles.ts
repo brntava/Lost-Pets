@@ -58,7 +58,8 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderWidth: 0.5,
     borderColor: '#ccc',
-    margin: 16,
+    margin: 20,
+    paddingTop: 16,
   },
   postSightingsModalHeader: {
     flexDirection: 'row',
@@ -83,7 +84,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   sightingDescription: {
-    fontSize: 16,
+    fontSize: 14,
   },
   editInput: {
     fontSize: 16,

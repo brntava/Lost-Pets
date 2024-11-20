@@ -82,6 +82,8 @@ type MyContextType = {
   setEditingAddPetPhoto: (editingAddPetPhoto: any) => void;
   editingRemovePetPhoto: any;
   setEditingRemovePetPhoto: (editingRemovePetPhoto: any) => void;
+  userImage: any;
+  setUserImage: (userImage: any) => void;
 };
 
 const PetsContext = createContext<MyContextType | undefined>(undefined);
@@ -109,7 +111,6 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     longitude: 0,
     latitudeDelta: 0.0032,
     longitudeDelta: 0.0032,
-    address: '',
   });
   const [petPhoto, setPetPhoto] = useState<any>([]);
   const [editingAddPetPhoto, setEditingAddPetPhoto] = useState<any>({});
@@ -124,7 +125,9 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loggedUser, setLoggedUser] = useState<any>({});
   const [visitorUser, setVisitorUser] = useState(false);
 
-  const { latitude, longitude, address } = sightingLocation;
+  const [userImage, setUserImage] = useState<any>([]);
+
+  const { latitude, longitude } = sightingLocation;
 
   const navigation = useNavigation();
 
@@ -153,8 +156,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
 
       const data: LoginResponse = await loginUser({
-        email,
-        password,
+        email: 'bruno5@gmail.com',
+        password: '123456',
       });
 
       const { token, user } = data;
@@ -192,8 +195,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       location: {
         latitude,
         longitude,
-        address,
       },
+      address,
       description: sightingDescription,
       missingPetId,
     };
@@ -251,8 +254,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         location: {
           latitude: sighting.location.latitude,
           longitude: sighting.location.longitude,
-          address: sighting.location.address,
         },
+        address: sighting.address,
         description: sighting.description,
       })),
       pet: {
@@ -432,7 +435,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const handleSearchMissingPet = async () => {
-    const data = (await getMissingPet(feedLocation.lat, feedLocation.lng, 50)) as any;
+    const data = (await getMissingPet(feedLocation.lat, feedLocation.lng, 10000000000)) as any;
 
     setMissingPetPost(data ?? []);
   };
@@ -499,6 +502,8 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setEditingAddPetPhoto,
         editingRemovePetPhoto,
         setEditingRemovePetPhoto,
+        userImage,
+        setUserImage,
       }}>
       {children}
     </PetsContext.Provider>

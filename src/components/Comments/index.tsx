@@ -9,7 +9,7 @@ import {
   TextInput,
   Text,
   Chip,
-  Icon,
+  Menu,
 } from 'react-native-paper';
 
 import { styles } from './styles';
@@ -26,8 +26,10 @@ type CommentsProps = {
   item: MissingPetType;
 };
 
+const URL = process.env.URL;
+
 export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
-  const { loggedUser, comments, setComments, visitorUser } = usePetsContext();
+  const { loggedUser, comments, setComments, visitorUser, userImage } = usePetsContext();
 
   const [textInput, setTextInput] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string>('');
@@ -35,6 +37,15 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
 
   const [isAwnser, setIsAwnser] = useState(false);
   const [commentId, setCommentId] = useState('');
+
+  const [optionsVisible, setOptionsVisible] = useState(false);
+  const [awnserOptionsVisible, setAwnserOptionsVisible] = useState(false);
+
+  const openMenu = () => setOptionsVisible(true);
+  const closeMenu = () => setOptionsVisible(false);
+
+  const openAwnserMenu = () => setAwnserOptionsVisible(true);
+  const closeAwnserMenu = () => setAwnserOptionsVisible(false);
 
   const commentInput = useRef(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -259,33 +270,52 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                           titleVariant="titleSmall"
                           subtitleVariant="labelSmall"
                           left={(props) => (
-                            <Avatar.Icon
+                            <Avatar.Image
                               {...props}
-                              icon="account"
+                              source={{
+                                uri:
+                                  userImage.uri ??
+                                  item.user.image.url.replace('http://localhost:5241', URL),
+                              }}
                               style={{ backgroundColor: '#ededed' }}
                             />
                           )}
                           right={(props) => (
                             <>
                               {isUserComment && (
-                                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                                  {editingCommentId !== comment.id && (
+                                <Menu
+                                  visible={optionsVisible}
+                                  onDismiss={closeMenu}
+                                  style={{ marginTop: 20 }}
+                                  contentStyle={{ backgroundColor: '#fffafa' }}
+                                  anchor={
                                     <IconButton
                                       {...props}
-                                      icon="pencil"
-                                      size={13}
-                                      style={{ paddingLeft: 10 }}
-                                      onPress={() => handleEditComment(comment.id)}
+                                      icon="dots-vertical"
+                                      size={20}
+                                      onPress={openMenu}
+                                      style={{ paddingRight: 10 }}
+                                    />
+                                  }>
+                                  {editingCommentId !== comment.id && (
+                                    <Menu.Item
+                                      onPress={() => {
+                                        handleEditComment(comment.id);
+                                        closeMenu();
+                                      }}
+                                      title="Editar"
+                                      leadingIcon="pencil"
                                     />
                                   )}
-                                  <IconButton
-                                    {...props}
-                                    icon="trash-can-outline"
-                                    size={13}
-                                    style={{ paddingRight: 10 }}
-                                    onPress={() => handleDeleteComment(comment.id)}
+                                  <Menu.Item
+                                    onPress={() => {
+                                      handleDeleteComment(comment.id);
+                                      closeMenu();
+                                    }}
+                                    title="Excluir"
+                                    leadingIcon="trash-can-outline"
                                   />
-                                </View>
+                                </Menu>
                               )}
                             </>
                           )}
@@ -303,33 +333,66 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
 
                             return (
                               <View style={[styles.answerCommentContainer]} key={index}>
-                                <View style={{ marginLeft: 10 }}>
-                                  <Icon source="account" size={20} />
+                                <View style={{ marginLeft: 6 }}>
+                                  <Avatar.Image
+                                    source={{
+                                      uri:
+                                        userImage.uri ??
+                                        item.user.image.url.replace('http://localhost:5241', URL),
+                                    }}
+                                    size={40}
+                                  />
                                 </View>
                                 <View style={{ flexDirection: 'column' }}>
                                   <View style={styles.answerCommentHeader}>
                                     <Text style={styles.answerCommentHeaderText}>
                                       {awnser.user.userName}
                                       {' - '}
-                                      {new Date(awnser.createdAt).toLocaleDateString('pt-br')}
+                                      {new Date(awnser.createdAt).toLocaleString('pt-br', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                      })}
                                     </Text>
                                     {isUserAwnser && (
-                                      <View style={{ flexDirection: 'row', marginLeft: 50 }}>
-                                        {editingAwnserCommentId !== awnser.id && (
-                                          <IconButton
-                                            icon="pencil"
-                                            size={12}
-                                            style={{ paddingLeft: 10 }}
-                                            onPress={() => handleEditComment(comment.id, awnser.id)}
+                                      <>
+                                        <Menu
+                                          visible={awnserOptionsVisible}
+                                          onDismiss={closeAwnserMenu}
+                                          contentStyle={{
+                                            backgroundColor: '#fffafa',
+                                            marginTop: 20,
+                                          }}
+                                          anchor={
+                                            <IconButton
+                                              icon="dots-vertical"
+                                              size={20}
+                                              onPress={openAwnserMenu}
+                                              style={{ paddingRight: 10 }}
+                                            />
+                                          }>
+                                          {editingAwnserCommentId !== awnser.id && (
+                                            <Menu.Item
+                                              onPress={() => {
+                                                handleEditComment(comment.id, awnser.id);
+                                                closeAwnserMenu();
+                                              }}
+                                              title="Editar"
+                                              leadingIcon="pencil"
+                                            />
+                                          )}
+                                          <Menu.Item
+                                            onPress={() => {
+                                              handleDeleteComment(comment.id, awnser.id);
+                                              closeAwnserMenu();
+                                            }}
+                                            title="Excluir"
+                                            leadingIcon="trash-can-outline"
                                           />
-                                        )}
-                                        <IconButton
-                                          icon="trash-can-outline"
-                                          size={12}
-                                          style={{ paddingRight: 15 }}
-                                          onPress={() => handleDeleteComment(comment.id, awnser.id)}
-                                        />
-                                      </View>
+                                        </Menu>
+                                      </>
                                     )}
                                   </View>
                                   <View style={styles.answerCommentContent}>

@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
+import { Avatar } from 'react-native-paper';
 
 import styles from './styles';
 
 import { FeedPost } from '~/components/FeedPost';
+import { ImagePickerScreen } from '~/components/ImagePickerScreen';
 import { usePetsContext } from '~/context/petsContext';
 import { getUser } from '~/services/Users/users';
 
+const URL = process.env.URL;
+
 export const MyProfile = () => {
-  const { loggedUser } = usePetsContext();
+  const { loggedUser, userImage } = usePetsContext();
 
   const [userPost, setUserPost] = useState<any>([]);
 
@@ -67,10 +71,14 @@ export const MyProfile = () => {
       data={[{}]}
       renderItem={() => (
         <View style={styles.container}>
-          <Image
+          <Avatar.Image
             style={styles.profilePicture}
-            source={require('../../../assets/paw-pet-login.png')}
+            source={{
+              uri: userImage.uri ?? loggedUser.image.url.replace('http://localhost:5241', URL),
+            }}
+            size={100}
           />
+          <ImagePickerScreen isProfile />
           <Text style={styles.welcomeText}>Olá, {loggedUser.userName}!</Text>
           {renderUserInfo()}
         </View>

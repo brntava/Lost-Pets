@@ -82,6 +82,7 @@ export const styles = StyleSheet.create({
   answerCommentHeaderText: {
     fontSize: 12,
     marginLeft: 20,
+    marginRight: 53,
     fontWeight: '500',
   },
   answerCommentContent: {

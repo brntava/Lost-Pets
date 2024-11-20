@@ -6,12 +6,15 @@ import { IconButton } from 'react-native-paper';
 import { styles } from './styles';
 
 import { usePetsContext } from '~/context/petsContext';
+import { addUserImage } from '~/services/Users/users';
 import { ImageType } from '~/types/imageTypes';
+import { getUserToken } from '~/utils/getUserToken';
 
 type ImageProps = {
   isEditing?: boolean;
   petId?: string;
   editingImages?: any;
+  isProfile?: boolean;
 };
 
 type EditingPetPhotoParams = {
@@ -31,8 +34,8 @@ type EditingPetPhotoParams = {
 
 const baseURL = process.env.URL;
 
-export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProps) => {
-  const { petPhoto, setPetPhoto, setEditingAddPetPhoto, setEditingRemovePetPhoto } =
+export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }: ImageProps) => {
+  const { petPhoto, setPetPhoto, setEditingAddPetPhoto, setEditingRemovePetPhoto, setUserImage } =
     usePetsContext();
 
   const [editPostImages, setEditPostImages] = useState(editingImages ?? []);
@@ -60,6 +63,11 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
 
     if (result.canceled) return;
 
+    if (isProfile) {
+      setUserImage(result.assets[0]);
+      handleUserImage(result.assets[0]);
+    }
+
     const formData = new FormData();
 
     formData.append('formFiles', {
@@ -80,7 +88,7 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
       }));
     }
 
-    setPetPhoto((img: any) => [...img, result.assets[0]]);
+    if (!isProfile) setPetPhoto((img: any) => [...img, result.assets[0]]);
   };
 
   const removeImage = (imgIndex: number) => {
@@ -101,35 +109,65 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages }: ImageProp
     setPetPhoto((images: ImageType[]) => images.filter((_, index) => index !== imgIndex));
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Fotos</Text>
-        {petPhoto?.length < 4 && (
-          <TouchableOpacity onPress={pickImage}>
-            <Text style={styles.addImg}>+</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      {petPhoto && (
-        <>
-          {petPhoto.map((img: any, index: number) => {
-            const imgURL = img.url?.replace('https://localhost:5241', `${baseURL}/`);
+  const handleUserImage = async (image: any) => {
+    const formData = new FormData();
 
-            return (
-              <View style={styles.imageContainer} key={index}>
-                <Image source={{ uri: img.uri ?? imgURL }} style={styles.image} />
-                <IconButton
-                  icon="trash-can"
-                  size={20}
-                  style={styles.trashIcon}
-                  onPress={() => removeImage(index)}
-                />
-              </View>
-            );
-          })}
-        </>
+    formData.append('formFile', {
+      uri: image?.uri,
+      name: image.fileName || 'name',
+      type: image.type,
+    });
+
+    try {
+      const autCookie = await getUserToken();
+
+      if (!autCookie) return;
+
+      const image2 = await addUserImage(formData, autCookie);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <>
+      {isProfile ? (
+        <View style={styles.addProfileImageContainer}>
+          <TouchableOpacity onPress={pickImage}>
+            <Text style={styles.addProfileImage}>+</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Fotos</Text>
+            {petPhoto?.length < 4 && (
+              <TouchableOpacity onPress={pickImage}>
+                <Text style={styles.addImg}>+</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {petPhoto && (
+            <>
+              {petPhoto.map((img: any, index: number) => {
+                const imgURL = img.url?.replace('https://localhost:5241', `${baseURL}/`);
+
+                return (
+                  <View style={styles.imageContainer} key={index}>
+                    <Image source={{ uri: img.uri ?? imgURL }} style={styles.image} />
+                    <IconButton
+                      icon="trash-can"
+                      size={20}
+                      style={styles.trashIcon}
+                      onPress={() => removeImage(index)}
+                    />
+                  </View>
+                );
+              })}
+            </>
+          )}
+        </View>
       )}
-    </View>
+    </>
   );
 };
