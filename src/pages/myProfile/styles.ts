@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   welcomeText: {
-    marginTop: 25,
+    marginTop: 18,
     color: '#000',
     fontSize: 28,
     fontWeight: 'bold',

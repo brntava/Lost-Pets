@@ -1,12 +1,12 @@
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Image, Platform, Text } from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { TouchableOpacity, View, Image, Platform, Text, Alert } from 'react-native';
+import { IconButton, Menu } from 'react-native-paper';
 
 import { styles } from './styles';
 
 import { usePetsContext } from '~/context/petsContext';
-import { addUserImage } from '~/services/Users/users';
+import { addUserImage, deleteUserImage } from '~/services/Users/users';
 import { ImageType } from '~/types/imageTypes';
 import { getUserToken } from '~/utils/getUserToken';
 
@@ -32,13 +32,26 @@ type EditingPetPhotoParams = {
   ];
 };
 
-const baseURL = process.env.URL;
+const URL = process.env.URL;
 
 export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }: ImageProps) => {
-  const { petPhoto, setPetPhoto, setEditingAddPetPhoto, setEditingRemovePetPhoto, setUserImage } =
-    usePetsContext();
+  const {
+    petPhoto,
+    setPetPhoto,
+    setEditingAddPetPhoto,
+    setEditingRemovePetPhoto,
+    setUserImage,
+    userImage,
+    loggedUser,
+  } = usePetsContext();
 
   const [editPostImages, setEditPostImages] = useState(editingImages ?? []);
+  const [optionsVisible, setOptionsVisible] = useState(false);
+
+  const openMenu = () => setOptionsVisible(true);
+  const closeMenu = () => setOptionsVisible(false);
+
+  const imageUri = userImage?.uri ?? loggedUser.image?.url?.replace('http://localhost:5241', URL);
 
   useEffect(() => {
     if (isEditing) setPetPhoto(editingImages);
@@ -123,19 +136,61 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
 
       if (!autCookie) return;
 
-      const image2 = await addUserImage(formData, autCookie);
+      await addUserImage(formData, autCookie);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleDeleteUserImage = async () => {
+    closeMenu();
+
+    Alert.alert('', 'Tem certeza que deseja remover?', [
+      {
+        text: 'Cancelar',
+        style: 'destructive',
+      },
+      {
+        text: 'Remover',
+        onPress: async () => {
+          try {
+            const autCookie = await getUserToken();
+
+            if (!autCookie) return;
+
+            await deleteUserImage(autCookie);
+
+            setUserImage(null);
+          } catch (err) {
+            console.error(`Erro ${err.response?.data}`);
+          }
+        },
+      },
+    ]);
   };
 
   return (
     <>
       {isProfile ? (
         <View style={styles.addProfileImageContainer}>
-          <TouchableOpacity onPress={pickImage}>
-            <Text style={styles.addProfileImage}>+</Text>
-          </TouchableOpacity>
+          <Menu
+            visible={optionsVisible}
+            onDismiss={closeMenu}
+            style={{ marginTop: 20 }}
+            contentStyle={{ backgroundColor: '#fffafa' }}
+            anchor={
+              <IconButton
+                icon="dots-vertical"
+                size={20}
+                onPress={openMenu}
+                style={{ paddingRight: 10 }}
+              />
+            }>
+            <Menu.Item onPress={pickImage} title="Adicionar" leadingIcon="plus" />
+            {imageUri && (
+              <Menu.Item onPress={handleDeleteUserImage} title="Remover" leadingIcon="trash-can" />
+            )}
+          </Menu>
         </View>
       ) : (
         <View style={styles.container}>
@@ -150,7 +205,7 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
           {petPhoto && (
             <>
               {petPhoto.map((img: any, index: number) => {
-                const imgURL = img.url?.replace('https://localhost:5241', `${baseURL}/`);
+                const imgURL = img.url?.replace('https://localhost:5241', `${URL}/`);
 
                 return (
                   <View style={styles.imageContainer} key={index}>

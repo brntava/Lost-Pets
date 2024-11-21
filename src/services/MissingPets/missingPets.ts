@@ -66,12 +66,20 @@ export const deleteMissingPet = async (petId: string, autCookie: string) => {
   });
 };
 
-export const deactivateMissingPet = async (petId: string) => {
-  try {
-    await axios.delete<Promise<MissingPetTypeRequest>>(`/missing-pet/${petId}/deactivate`);
-  } catch (err) {
-    throw new Error(`Error ${err}`);
-  }
+export const deactivateMissingPet = async (petId: string, autCookie: string) => {
+  return await axios.delete(`${URL}/api/MissingPet/${petId}/deactivate`, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
+  });
+};
+
+export const activateMissingPet = async (petId: string, autCookie: string) => {
+  return await axios.post(`${URL}/api/MissingPet/${petId}/activate`, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
+  });
 };
 
 export const addMissingPetImage = async (petId: string, body: FormData, autCookie: string) => {

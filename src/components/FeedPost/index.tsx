@@ -19,7 +19,7 @@ import { ImageSkeleton } from '../ImageSkeleton';
 import { SightingMap } from '../SightingMap';
 
 import { usePetsContext } from '~/context/petsContext';
-import { deleteMissingPet } from '~/services/MissingPets/missingPets';
+import { deactivateMissingPet, deleteMissingPet } from '~/services/MissingPets/missingPets';
 import { PostImageType } from '~/types/imageTypes';
 import { MissingPetType } from '~/types/missingPetTypes';
 import { SightingModalNavigationProp } from '~/types/navigationTypes';
@@ -60,6 +60,8 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
   const openMenu = () => setOptionsVisible(true);
   const closeMenu = () => setOptionsVisible(false);
 
+  const imageUri = userImage?.uri ?? item.user.image?.url?.replace('http://localhost:5241', URL);
+
   const navigation = useNavigation<SightingModalNavigationProp>();
 
   const isUserPost = item.user.id === loggedUser?.id;
@@ -67,8 +69,8 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-  const openImageModal = (imageUri: string) => {
-    setSelectedImage(imageUri);
+  const openImageModal = (url: string) => {
+    setSelectedImage(url);
     setImageModalVisible(true);
   };
 
@@ -108,6 +110,33 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
     ]);
   };
 
+  const handleDeactivate = (id: string) => {
+    closeMenu();
+
+    Alert.alert('', 'Tem certeza que deseja desativar?', [
+      {
+        text: 'Cancelar',
+        style: 'destructive',
+      },
+      {
+        text: 'Desativar',
+        onPress: async () => {
+          const autCookie = await getUserToken();
+
+          if (!autCookie) return;
+
+          setLoading(true);
+
+          await deactivateMissingPet(id, autCookie);
+
+          handleSearchMissingPet();
+
+          setLoading(false);
+        },
+      },
+    ]);
+  };
+
   return (
     <>
       <Portal>
@@ -138,7 +167,9 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
           />
         </Modal>
       </Portal>
-      <View style={styles.cardContainer} key={index}>
+      <View
+        style={[styles.cardContainer, item.status === 2 ? { backgroundColor: 'blue' } : {}]}
+        key={index}>
         <Card style={{ backgroundColor: '#fffafa' }}>
           <Card.Title
             title={item.user.userName}
@@ -151,12 +182,19 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
             })}
             titleVariant="titleMedium"
             left={(props) => (
-              <Avatar.Image
-                {...props}
-                source={{
-                  uri: userImage.uri ?? item.user.image.url.replace('http://localhost:5241', URL),
-                }}
-              />
+              <>
+                {imageUri ? (
+                  <Avatar.Image
+                    {...props}
+                    source={{
+                      uri: imageUri,
+                    }}
+                    size={45}
+                  />
+                ) : (
+                  <Avatar.Icon size={45} icon="account" style={{ backgroundColor: 'lightgray' }} />
+                )}
+              </>
             )}
             right={(props) => (
               <>
@@ -191,7 +229,11 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                       title="Editar"
                       leadingIcon="pencil"
                     />
-                    <Menu.Item onPress={() => {}} title="Desativar" leadingIcon="eye-off" />
+                    <Menu.Item
+                      onPress={() => handleDeactivate(item.id)}
+                      title="Desativar"
+                      leadingIcon="eye-off"
+                    />
                     <Menu.Item
                       onPress={() => {
                         closeMenu();
@@ -257,7 +299,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
             </ScrollView>
           </Card.Content>
           <Chip
-            icon="map-marker"
+            icon={() => <Icon size={20} source="map-marker" color="#228c80" />}
             style={[styles.cardComment, styles.cardSightings]}
             onPress={() => setRenderPostSightings(true)}>
             Avistamentos
@@ -355,7 +397,10 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
               </Modal>
             </Portal>
           )}
-          <Chip icon="comment" style={styles.cardComment} onPress={showModal}>
+          <Chip
+            icon={() => <Icon size={20} source="comment-text-outline" color="#228c80" />}
+            style={styles.cardComment}
+            onPress={showModal}>
             Comentarios...
           </Chip>
           <Comments visible={visible} hideModal={hideModal} item={item} key={index} />

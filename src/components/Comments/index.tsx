@@ -10,6 +10,7 @@ import {
   Text,
   Chip,
   Menu,
+  Icon,
 } from 'react-native-paper';
 
 import { styles } from './styles';
@@ -51,6 +52,8 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const imageUri = userImage?.uri ?? item.user.image?.url?.replace('http://localhost:5241', URL);
 
   useEffect(() => {
     if (comments.length === 0) setComments(item.comments);
@@ -270,15 +273,23 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                           titleVariant="titleSmall"
                           subtitleVariant="labelSmall"
                           left={(props) => (
-                            <Avatar.Image
-                              {...props}
-                              source={{
-                                uri:
-                                  userImage.uri ??
-                                  item.user.image.url.replace('http://localhost:5241', URL),
-                              }}
-                              style={{ backgroundColor: '#ededed' }}
-                            />
+                            <>
+                              {imageUri ? (
+                                <Avatar.Image
+                                  {...props}
+                                  source={{
+                                    uri: imageUri,
+                                  }}
+                                  size={45}
+                                />
+                              ) : (
+                                <Avatar.Icon
+                                  size={45}
+                                  icon="account"
+                                  style={{ backgroundColor: 'lightgray' }}
+                                />
+                              )}
+                            </>
                           )}
                           right={(props) => (
                             <>
@@ -334,14 +345,20 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                             return (
                               <View style={[styles.answerCommentContainer]} key={index}>
                                 <View style={{ marginLeft: 6 }}>
-                                  <Avatar.Image
-                                    source={{
-                                      uri:
-                                        userImage.uri ??
-                                        item.user.image.url.replace('http://localhost:5241', URL),
-                                    }}
-                                    size={40}
-                                  />
+                                  {imageUri ? (
+                                    <Avatar.Image
+                                      source={{
+                                        uri: imageUri,
+                                      }}
+                                      size={38}
+                                    />
+                                  ) : (
+                                    <Avatar.Icon
+                                      size={38}
+                                      icon="account"
+                                      style={{ backgroundColor: 'lightgray' }}
+                                    />
+                                  )}
                                 </View>
                                 <View style={{ flexDirection: 'column' }}>
                                   <View style={styles.answerCommentHeader}>
@@ -414,7 +431,9 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                       )}
                       {!visitorUser && (
                         <Chip
-                          icon="chat-processing-outline"
+                          icon={() => (
+                            <Icon size={20} source="chat-processing-outline" color="#228c80" />
+                          )}
                           onPress={() => {
                             setIsAwnser(true);
                             setCommentId(comment.id);

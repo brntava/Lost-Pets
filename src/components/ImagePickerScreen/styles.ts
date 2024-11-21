@@ -44,8 +44,8 @@ export const styles = StyleSheet.create({
   },
   addProfileImageContainer: {
     position: 'absolute',
-    top: '6.2%',
-    right: '39%',
+    top: '7%',
+    right: '31.5%',
   },
   addProfileImage: {
     fontSize: 40,

@@ -16,6 +16,8 @@ export const MyProfile = () => {
 
   const [userPost, setUserPost] = useState<any>([]);
 
+  const imageUri = userImage?.uri ?? loggedUser.image?.url?.replace('http://localhost:5241', URL);
+
   const fetchUserData = async () => {
     const id = loggedUser.id;
 
@@ -35,25 +37,25 @@ export const MyProfile = () => {
   const renderUserInfo = () => (
     <View style={styles.userInfo}>
       <View style={styles.userInfoContent}>
-        <Text style={styles.userInfoLabel}>Nome:</Text>
+        <Text style={styles.userInfoLabel}>Nome</Text>
         <Text style={styles.userInfoValue}>{loggedUser.userName}</Text>
       </View>
       <View style={styles.userInfoContent}>
-        <Text style={styles.userInfoLabel}>Email:</Text>
+        <Text style={styles.userInfoLabel}>Email</Text>
         <Text style={styles.userInfoValue}>{loggedUser.email}</Text>
       </View>
       <View style={styles.userInfoContent}>
-        <Text style={styles.userInfoLabel}>Contato:</Text>
+        <Text style={styles.userInfoLabel}>Contato</Text>
         <Text style={styles.userInfoValue}>{loggedUser.contacts[0]?.content}</Text>
       </View>
       {loggedUser.contacts.length > 1 && (
         <View style={styles.userInfoContent}>
-          <Text style={styles.userInfoLabel}>Contato Opcional:</Text>
+          <Text style={styles.userInfoLabel}>Contato Opcional</Text>
           <Text style={styles.userInfoValue}>{loggedUser.contacts[1]?.content}</Text>
         </View>
       )}
       <View style={styles.userInfoContent}>
-        <Text style={styles.userInfoLabel}>Minhas publicações</Text>
+        <Text style={styles.userInfoLabel}>Minhas publicações:</Text>
         {userPost && userPost.length > 0 ? (
           <FlatList
             data={userPost}
@@ -71,13 +73,21 @@ export const MyProfile = () => {
       data={[{}]}
       renderItem={() => (
         <View style={styles.container}>
-          <Avatar.Image
-            style={styles.profilePicture}
-            source={{
-              uri: userImage.uri ?? loggedUser.image.url.replace('http://localhost:5241', URL),
-            }}
-            size={100}
-          />
+          {imageUri ? (
+            <Avatar.Image
+              style={styles.profilePicture}
+              source={{
+                uri: imageUri,
+              }}
+              size={120}
+            />
+          ) : (
+            <Avatar.Icon
+              style={[styles.profilePicture, { backgroundColor: 'lightgray' }]}
+              size={120}
+              icon="account"
+            />
+          )}
           <ImagePickerScreen isProfile />
           <Text style={styles.welcomeText}>Olá, {loggedUser.userName}!</Text>
           {renderUserInfo()}

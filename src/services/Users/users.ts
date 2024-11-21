@@ -42,3 +42,11 @@ export const addUserImage = async (body: FormData, autCookie: string) => {
 
   return data;
 };
+
+export const deleteUserImage = async (autCookie: string) => {
+  return await axios.delete(`${URL}/api/User/image`, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
+  });
+};

@@ -26,10 +26,10 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 22,
     marginLeft: 15,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   notFoundText: {
-    fontSize: 18,
+    fontSize: 16,
     marginLeft: 15,
     marginBottom: 20,
     lineHeight: 30,

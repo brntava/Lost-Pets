@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, RefreshControl } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { Chip, Portal, Modal } from 'react-native-paper';
+import { Chip, Portal, Modal, Icon } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from './styles';
@@ -41,9 +41,14 @@ export const Feed = () => {
       <Loading />
       <SafeAreaView style={styles.container}>
         <TopMenu />
-        <Chip icon="map-marker" style={styles.feedMapLocation} onPress={() => setTabIndex(2)}>
-          {feedLocation.address !== '' ? feedLocation.address : 'Selecionar localização...'}
-        </Chip>
+        {feedLocation.address !== '' && (
+          <Chip
+            icon={() => <Icon size={20} source="map-marker" color="#228c80" />}
+            style={styles.feedMapLocation}
+            onPress={() => setTabIndex(2)}>
+            {feedLocation.address}
+          </Chip>
+        )}
         {feedLocation.address === '' ? (
           <Portal>
             <Modal
@@ -59,7 +64,7 @@ export const Feed = () => {
                   Selecione uma localização para filtrar publicações
                 </Text>
                 <Chip
-                  icon="map-marker"
+                  icon={() => <Icon size={20} source="map-marker" color="#228c80" />}
                   style={[styles.feedMapLocation, styles.feedMapLocationModal]}
                   onPress={() => {
                     setTabIndex(2);
