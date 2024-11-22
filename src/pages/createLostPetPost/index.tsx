@@ -62,7 +62,11 @@ export const CreateLostPetPost = () => {
   };
 
   useEffect(() => {
-    if (editingPost) setAgeUnit(petAge.includes('00') ? 'Meses' : ' Anos');
+    if (editingPost) {
+      const unit = petAge.includes('00') ? 'Meses' : 'Anos';
+
+      setAgeUnit(unit);
+    }
 
     setRemovedContact('');
     setUserContact(editingPost?.contacts ?? loggedUser?.contacts);
@@ -206,30 +210,26 @@ export const CreateLostPetPost = () => {
                 <Text style={styles.ageUnitText}>{ageUnit}</Text>
                 <Icon source="arrow-down-drop-circle-outline" size={18} color="black" />
               </TouchableOpacity>
-              {showPicker && (
-                <Portal>
-                  <Modal
-                    visible={showPicker}
-                    onDismiss={() => setShowPicker(false)}
-                    contentContainerStyle={styles.modalContainer}>
-                    <Picker
-                      selectedValue={ageUnit}
-                      onValueChange={(itemValue) => setAgeUnit(itemValue)}
-                      style={{ height: 180 }}>
-                      <Picker.Item label="Anos" value="Anos" />
-                      <Picker.Item label="Meses" value="Meses" />
-                    </Picker>
-                    <Button
-                      mode="contained"
-                      onPress={() => setShowPicker(false)}
-                      style={styles.selectButton}
-                      icon="check">
-                      Selecionar
-                    </Button>
-                  </Modal>
-                </Portal>
-              )}
             </View>
+            {showPicker && (
+              <View style={styles.overlay}>
+                <View style={styles.modalContainer}>
+                  <Picker
+                    selectedValue={ageUnit}
+                    onValueChange={setAgeUnit}
+                    style={{ height: 180 }}>
+                    <Picker.Item label="Anos" value="Anos" />
+                    <Picker.Item label="Meses" value="Meses" />
+                  </Picker>
+                  <Button
+                    mode="contained"
+                    onPress={() => setShowPicker(false)}
+                    style={styles.selectButton}>
+                    Selecionar
+                  </Button>
+                </View>
+              </View>
+            )}
 
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Contato</Text>

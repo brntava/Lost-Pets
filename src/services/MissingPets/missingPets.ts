@@ -75,11 +75,15 @@ export const deactivateMissingPet = async (petId: string, autCookie: string) => 
 };
 
 export const activateMissingPet = async (petId: string, autCookie: string) => {
-  return await axios.post(`${URL}/api/MissingPet/${petId}/activate`, {
-    headers: {
-      Authorization: `Bearer ${autCookie}`,
-    },
-  });
+  return await axios.post(
+    `${URL}/api/MissingPet/${petId}/activate`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${autCookie}`,
+      },
+    }
+  );
 };
 
 export const addMissingPetImage = async (petId: string, body: FormData, autCookie: string) => {

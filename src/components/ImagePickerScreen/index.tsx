@@ -43,6 +43,7 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
     setUserImage,
     userImage,
     loggedUser,
+    setLoading,
   } = usePetsContext();
 
   const [editPostImages, setEditPostImages] = useState(editingImages ?? []);
@@ -79,6 +80,7 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
     if (isProfile) {
       setUserImage(result.assets[0]);
       handleUserImage(result.assets[0]);
+      closeMenu();
     }
 
     const formData = new FormData();
@@ -132,13 +134,18 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
     });
 
     try {
+      setLoading(true);
+
       const autCookie = await getUserToken();
 
       if (!autCookie) return;
 
       await addUserImage(formData, autCookie);
+
+      setLoading(false);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
   };
 
@@ -154,6 +161,8 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
         text: 'Remover',
         onPress: async () => {
           try {
+            setLoading(true);
+
             const autCookie = await getUserToken();
 
             if (!autCookie) return;
@@ -161,8 +170,10 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
             await deleteUserImage(autCookie);
 
             setUserImage(null);
+            setLoading(false);
           } catch (err) {
             console.error(`Erro ${err.response?.data}`);
+            setLoading(false);
           }
         },
       },
@@ -172,26 +183,24 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
   return (
     <>
       {isProfile ? (
-        <View style={styles.addProfileImageContainer}>
-          <Menu
-            visible={optionsVisible}
-            onDismiss={closeMenu}
-            style={{ marginTop: 20 }}
-            contentStyle={{ backgroundColor: '#fffafa' }}
-            anchor={
-              <IconButton
-                icon="dots-vertical"
-                size={20}
-                onPress={openMenu}
-                style={{ paddingRight: 10 }}
-              />
-            }>
-            <Menu.Item onPress={pickImage} title="Adicionar" leadingIcon="plus" />
-            {imageUri && (
-              <Menu.Item onPress={handleDeleteUserImage} title="Remover" leadingIcon="trash-can" />
-            )}
-          </Menu>
-        </View>
+        <Menu
+          visible={optionsVisible}
+          onDismiss={closeMenu}
+          style={{ marginLeft: 110, marginTop: 10, height: 18 }}
+          contentStyle={{ backgroundColor: '#fffafa' }}
+          anchor={
+            <IconButton
+              icon="dots-vertical"
+              size={20}
+              onPress={openMenu}
+              style={{ marginLeft: 110, height: 18 }}
+            />
+          }>
+          <Menu.Item onPress={pickImage} title="Adicionar" leadingIcon="plus" />
+          {imageUri && (
+            <Menu.Item onPress={handleDeleteUserImage} title="Remover" leadingIcon="trash-can" />
+          )}
+        </Menu>
       ) : (
         <View style={styles.container}>
           <View style={styles.titleContainer}>
@@ -205,7 +214,7 @@ export const ImagePickerScreen = ({ isEditing, petId, editingImages, isProfile }
           {petPhoto && (
             <>
               {petPhoto.map((img: any, index: number) => {
-                const imgURL = img.url?.replace('https://localhost:5241', `${URL}/`);
+                const imgURL = img.url?.replace('http://localhost:5241', `${URL}/`);
 
                 return (
                   <View style={styles.imageContainer} key={index}>

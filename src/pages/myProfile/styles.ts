@@ -5,6 +5,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+    height: '100%',
+  },
+  headerContainer: {
+    alignItems: 'center',
   },
   welcomeText: {
     marginTop: 18,
@@ -33,13 +37,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 16,
   },
-  profilePicture: {
-    display: 'flex',
+  profileContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    resizeMode: 'contain',
-    alignSelf: 'center',
     marginTop: 20,
+  },
+  profilePicture: {
     borderRadius: 75,
     shadowOffset: {
       width: 10,
@@ -47,6 +51,9 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 10,
+  },
+  menuContainer: {
+    marginLeft: 10,
   },
 });
 

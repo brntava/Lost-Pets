@@ -11,11 +11,8 @@ import {
 } from '~/services/MissingPets/missingPets';
 import { createSighthing, deleteSighthing } from '~/services/MissingPets/sighthings';
 import { loginUser, registerUser } from '~/services/Users/users';
-import { CommentsType } from '~/types/commentTypes';
 import { ContactType } from '~/types/contactTypes';
-import { LocationType } from '~/types/locationTypes';
 import { PetTypeRequest } from '~/types/petTypes';
-import { ImageType } from '~/types/photoTypes';
 import { SighthingType } from '~/types/sighthingTypes';
 import { LoggedUser, LoginResponse, UserRequestBody } from '~/types/userTypes';
 import { findUpdatedContacts } from '~/utils/findUpdatedContacts';
@@ -51,8 +48,8 @@ type MyContextType = {
   setComments: (comments: any) => void;
   handleAddSighting: (isPost: boolean, missingPetId: string) => void;
   handleSubmitMissingPet: (data: PetTypeRequest) => void;
-  sightingLocation: LocationType;
-  setSightingLocation: (sightingLocation: LocationType) => void;
+  sightingLocation: any;
+  setSightingLocation: (sightingLocation: any) => void;
   missingPetPost: any[];
   setMissingPetPost: (missingPetPost: never[]) => void;
   petPhoto: any[];
@@ -106,11 +103,12 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [sightingDescription, setSightingDescription] = useState('');
   const [showSightings, setShowSightings] = useState(false);
   const [addSightingVisible, setAddSightingVisible] = useState(false);
-  const [sightingLocation, setSightingLocation] = useState<LocationType>({
+  const [sightingLocation, setSightingLocation] = useState({
     latitude: 0,
     longitude: 0,
     latitudeDelta: 0.0032,
     longitudeDelta: 0.0032,
+    address: '',
   });
   const [petPhoto, setPetPhoto] = useState<any>([]);
   const [editingAddPetPhoto, setEditingAddPetPhoto] = useState<any>({});
@@ -127,7 +125,7 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [userImage, setUserImage] = useState<any>([]);
 
-  const { latitude, longitude } = sightingLocation;
+  const { latitude, longitude, address } = sightingLocation;
 
   const navigation = useNavigation();
 

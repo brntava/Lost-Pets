@@ -8,11 +8,12 @@ import { FeedPost } from '~/components/FeedPost';
 import { ImagePickerScreen } from '~/components/ImagePickerScreen';
 import { usePetsContext } from '~/context/petsContext';
 import { getUser } from '~/services/Users/users';
+import { getUserToken } from '~/utils/getUserToken';
 
 const URL = process.env.URL;
 
 export const MyProfile = () => {
-  const { loggedUser, userImage } = usePetsContext();
+  const { loggedUser, userImage, missingPetPost } = usePetsContext();
 
   const [userPost, setUserPost] = useState<any>([]);
 
@@ -22,7 +23,11 @@ export const MyProfile = () => {
     const id = loggedUser.id;
 
     try {
-      const user = await getUser(id);
+      const autCookie = await getUserToken();
+
+      if (!autCookie) return;
+
+      const user = await getUser(id, autCookie);
 
       setUserPost(user?.missingPets);
     } catch (error) {
@@ -32,7 +37,7 @@ export const MyProfile = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, []);
+  }, [missingPetPost]);
 
   const renderUserInfo = () => (
     <View style={styles.userInfo}>
@@ -63,32 +68,35 @@ export const MyProfile = () => {
             keyExtractor={(item) => item.id}
           />
         ) : (
-          <Text style={styles.userInfoValue}>Não há nenhuma publicação</Text>
+          <Text style={styles.userInfoValue}>Não há publicações</Text>
         )}
       </View>
     </View>
   );
+
   return (
     <FlatList
       data={[{}]}
       renderItem={() => (
         <View style={styles.container}>
-          {imageUri ? (
-            <Avatar.Image
-              style={styles.profilePicture}
-              source={{
-                uri: imageUri,
-              }}
-              size={120}
-            />
-          ) : (
-            <Avatar.Icon
-              style={[styles.profilePicture, { backgroundColor: 'lightgray' }]}
-              size={120}
-              icon="account"
-            />
-          )}
-          <ImagePickerScreen isProfile />
+          <View style={styles.headerContainer}>
+            {imageUri ? (
+              <Avatar.Image
+                style={styles.profilePicture}
+                source={{
+                  uri: imageUri,
+                }}
+                size={120}
+              />
+            ) : (
+              <Avatar.Icon
+                style={[styles.profilePicture, { backgroundColor: 'lightgray' }]}
+                size={120}
+                icon="account"
+              />
+            )}
+            <ImagePickerScreen isProfile />
+          </View>
           <Text style={styles.welcomeText}>Olá, {loggedUser.userName}!</Text>
           {renderUserInfo()}
         </View>

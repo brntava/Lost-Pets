@@ -19,7 +19,11 @@ import { ImageSkeleton } from '../ImageSkeleton';
 import { SightingMap } from '../SightingMap';
 
 import { usePetsContext } from '~/context/petsContext';
-import { deactivateMissingPet, deleteMissingPet } from '~/services/MissingPets/missingPets';
+import {
+  activateMissingPet,
+  deactivateMissingPet,
+  deleteMissingPet,
+} from '~/services/MissingPets/missingPets';
 import { PostImageType } from '~/types/imageTypes';
 import { MissingPetType } from '~/types/missingPetTypes';
 import { SightingModalNavigationProp } from '~/types/navigationTypes';
@@ -65,6 +69,7 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
   const navigation = useNavigation<SightingModalNavigationProp>();
 
   const isUserPost = item.user.id === loggedUser?.id;
+  const isDeactivatedPost = item.status === 2;
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -121,20 +126,48 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
       {
         text: 'Desativar',
         onPress: async () => {
-          const autCookie = await getUserToken();
+          try {
+            const autCookie = await getUserToken();
 
-          if (!autCookie) return;
+            if (!autCookie) return;
 
-          setLoading(true);
+            setLoading(true);
 
-          await deactivateMissingPet(id, autCookie);
+            await deactivateMissingPet(id, autCookie);
 
-          handleSearchMissingPet();
+            handleSearchMissingPet();
 
-          setLoading(false);
+            setLoading(false);
+          } catch (err) {
+            console.error(err);
+
+            setLoading(false);
+          }
         },
       },
     ]);
+  };
+
+  const handleActivate = async (id: string) => {
+    closeMenu();
+
+    try {
+      const autCookie = await getUserToken();
+
+      if (!autCookie) return;
+
+      setLoading(true);
+
+      await activateMissingPet(id, autCookie);
+
+      handleSearchMissingPet();
+
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+
+      setLoading(false);
+    }
   };
 
   return (
@@ -149,7 +182,6 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
             <Image
               source={{ uri: selectedImage }}
               style={styles.fullImage}
-              resizeMode="contain"
               onLoadStart={() => setImageLoad(true)}
               onLoad={() => setImageLoad(false)}
               onError={() => {
@@ -167,12 +199,10 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
           />
         </Modal>
       </Portal>
-      <View
-        style={[styles.cardContainer, item.status === 2 ? { backgroundColor: 'blue' } : {}]}
-        key={index}>
-        <Card style={{ backgroundColor: '#fffafa' }}>
+      <View style={styles.cardContainer} key={index}>
+        <Card style={{ backgroundColor: `${isDeactivatedPost ? '#f0f0f0' : '#fffafa'}` }}>
           <Card.Title
-            title={item.user.userName}
+            title={`${item.user.userName} ${isDeactivatedPost ? '- DESATIVADO' : ''}`}
             subtitle={new Date(item.createdAt).toLocaleString('pt-br', {
               day: '2-digit',
               month: '2-digit',
@@ -230,9 +260,12 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                       leadingIcon="pencil"
                     />
                     <Menu.Item
-                      onPress={() => handleDeactivate(item.id)}
-                      title="Desativar"
-                      leadingIcon="eye-off"
+                      onPress={() => {
+                        if (isDeactivatedPost) handleActivate(item.id);
+                        else handleDeactivate(item.id);
+                      }}
+                      title={isDeactivatedPost ? 'Ativar' : 'Desativar'}
+                      leadingIcon={isDeactivatedPost ? 'eye' : 'eye-off'}
                     />
                     <Menu.Item
                       onPress={() => {
@@ -283,14 +316,13 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
 
                   return (
                     <TouchableOpacity key={index} onPress={() => openImageModal(imgURL)}>
-                      <Card.Cover
-                        source={{
-                          uri: imgURL,
-                        }}
+                      <Image
+                        source={{ uri: imgURL }}
+                        style={styles.cardImg}
+                        resizeMode="cover"
                         onError={() => {
                           console.error('Erro ao carregar a imagem');
                         }}
-                        style={styles.cardImg}
                       />
                     </TouchableOpacity>
                   );

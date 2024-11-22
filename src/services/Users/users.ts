@@ -24,11 +24,12 @@ export const loginUser = async (body: UserLoginBody) => {
   };
 };
 
-export const getUser = async (id: string) => {
-  const { data } = await axios.get<Promise<LoggedUser>>(`${URL}/api/User/${id}`);
-
-  if (!data) return;
-
+export const getUser = async (id: string, autCookie: string) => {
+  const { data } = await axios.get(`${URL}/api/User/${id}`, {
+    headers: {
+      Authorization: `Bearer ${autCookie}`,
+    },
+  });
   return data;
 };
 

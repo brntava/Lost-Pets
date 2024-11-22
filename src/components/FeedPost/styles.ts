@@ -16,6 +16,7 @@ export const styles = StyleSheet.create({
     width: 335,
     height: 230,
     marginRight: 8,
+    borderRadius: 12,
   },
   cardComment: {
     marginTop: 8,
@@ -109,7 +110,7 @@ export const styles = StyleSheet.create({
   },
   fullImage: {
     width: '90%',
-    height: '100%',
+    height: '50%',
     borderRadius: 12,
   },
   closeButton: {

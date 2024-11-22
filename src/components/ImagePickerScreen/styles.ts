@@ -42,12 +42,8 @@ export const styles = StyleSheet.create({
     right: 0,
     paddingLeft: 15,
   },
-  addProfileImageContainer: {
-    position: 'absolute',
-    top: '7%',
-    right: '31.5%',
-  },
   addProfileImage: {
     fontSize: 40,
+    marginLeft: 50,
   },
 });
