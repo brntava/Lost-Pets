@@ -39,14 +39,10 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
   const [isAwnser, setIsAwnser] = useState(false);
   const [commentId, setCommentId] = useState('');
 
-  const [optionsVisible, setOptionsVisible] = useState(false);
-  const [awnserOptionsVisible, setAwnserOptionsVisible] = useState(false);
+  const [menuOpenCommentId, setMenuOpenCommentId] = useState<string | null>(null);
 
-  const openMenu = () => setOptionsVisible(true);
-  const closeMenu = () => setOptionsVisible(false);
-
-  const openAwnserMenu = () => setAwnserOptionsVisible(true);
-  const closeAwnserMenu = () => setAwnserOptionsVisible(false);
+  const openMenu = (id: string) => setMenuOpenCommentId(id);
+  const closeMenu = () => setMenuOpenCommentId(null);
 
   const commentInput = useRef(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -295,7 +291,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                             <>
                               {isUserComment && (
                                 <Menu
-                                  visible={optionsVisible}
+                                  visible={menuOpenCommentId === comment.id}
                                   onDismiss={closeMenu}
                                   style={{ marginTop: 20 }}
                                   contentStyle={{ backgroundColor: '#fffafa' }}
@@ -304,7 +300,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                       {...props}
                                       icon="dots-vertical"
                                       size={20}
-                                      onPress={openMenu}
+                                      onPress={() => openMenu(comment.id)}
                                       style={{ paddingRight: 10 }}
                                     />
                                   }>
@@ -332,7 +328,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                           )}
                         />
                         <Card.Content>
-                          <Text>
+                          <Text style={{ marginLeft: 5 }}>
                             {editingCommentId === comment.id ? textInput : comment.content}
                           </Text>
                         </Card.Content>
@@ -376,8 +372,8 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                     {isUserAwnser && (
                                       <>
                                         <Menu
-                                          visible={awnserOptionsVisible}
-                                          onDismiss={closeAwnserMenu}
+                                          visible={menuOpenCommentId === awnser.id}
+                                          onDismiss={closeMenu}
                                           contentStyle={{
                                             backgroundColor: '#fffafa',
                                             marginTop: 20,
@@ -386,7 +382,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                             <IconButton
                                               icon="dots-vertical"
                                               size={20}
-                                              onPress={openAwnserMenu}
+                                              onPress={() => openMenu(awnser.id)}
                                               style={{ paddingRight: 10 }}
                                             />
                                           }>
@@ -394,7 +390,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                             <Menu.Item
                                               onPress={() => {
                                                 handleEditComment(comment.id, awnser.id);
-                                                closeAwnserMenu();
+                                                closeMenu();
                                               }}
                                               title="Editar"
                                               leadingIcon="pencil"
@@ -403,7 +399,7 @@ export const Comments = ({ visible, hideModal, item }: CommentsProps) => {
                                           <Menu.Item
                                             onPress={() => {
                                               handleDeleteComment(comment.id, awnser.id);
-                                              closeAwnserMenu();
+                                              closeMenu();
                                             }}
                                             title="Excluir"
                                             leadingIcon="trash-can-outline"

@@ -213,8 +213,9 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     setSightings([...sightings, newSighting]);
     setSightingDescription('');
-    setShowSightings(true);
     setAddSightingVisible(false);
+
+    if (!isPost) setShowSightings(true);
 
     navigation.goBack();
   };
@@ -224,13 +225,9 @@ export const PetsProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (!autCookie) return;
 
-    setLoading(true);
-
     await deleteSighthing(sightingId, autCookie);
 
     await handleSearchMissingPet();
-
-    setLoading(false);
   };
 
   const handleSubmitMissingPet = async (data: PetTypeRequest) => {

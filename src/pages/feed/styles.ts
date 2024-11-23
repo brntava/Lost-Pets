@@ -4,7 +4,6 @@ export const styles = StyleSheet.create({
   container: {
     height: '100%',
     marginBottom: 20,
-    paddingBottom: 15,
   },
   modalContainer: {
     backgroundColor: '#fff',
@@ -58,8 +57,12 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ededed',
   },
   feedMapLocationModal: {
-    borderRadius: 5,
+    backgroundColor: '#ededed',
     marginHorizontal: 12,
-    height: 50,
+  },
+  feedMapLocationModalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 });

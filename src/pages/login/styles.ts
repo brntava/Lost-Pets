@@ -7,6 +7,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#228c80',
   },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 40,
+    backgroundColor: '#228c80',
+  },
   UserImage: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -41,24 +46,18 @@ export const styles = StyleSheet.create({
   inputEmail: {
     backgroundColor: '#FFF',
     width: 250,
-    height: 35,
     borderRadius: 5,
-    padding: 5,
-    borderWidth: 1,
   },
   inputPassword: {
     backgroundColor: '#FFF',
     marginTop: 13,
     width: 250,
-    height: 35,
     borderRadius: 5,
-    padding: 5,
-    borderWidth: 1,
   },
   buttonForm: {
     backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: '#ccc',
+    borderColor: '#ededed',
     borderRadius: 5,
     width: 250,
     marginTop: 20,

@@ -401,7 +401,6 @@ export const FeedPost = ({ item, index }: FeedPostProps) => {
                                           text: 'Excluir',
                                           onPress: async () => {
                                             handleRemoveSighting(`${id}`);
-                                            setRenderPostSightings(false);
                                           },
                                         },
                                       ]);

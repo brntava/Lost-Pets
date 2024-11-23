@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   cardContainer: {
     margin: 8,
-    marginTop: 20,
   },
   cardImgContinainer: {
     marginTop: 8,
@@ -86,16 +85,6 @@ export const styles = StyleSheet.create({
   },
   sightingDescription: {
     fontSize: 14,
-  },
-  editInput: {
-    fontSize: 16,
-    marginTop: 10,
-    backgroundColor: '#fffafa',
-    height: 40,
-    width: '100%',
-  },
-  editTextarea: {
-    height: 100,
   },
   postTitle: {
     fontSize: 16,

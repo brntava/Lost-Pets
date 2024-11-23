@@ -64,13 +64,19 @@ export const Feed = () => {
                   Selecione uma localização para filtrar publicações
                 </Text>
                 <Chip
-                  icon={() => <Icon size={20} source="map-marker" color="#228c80" />}
-                  style={[styles.feedMapLocation, styles.feedMapLocationModal]}
+                  style={styles.feedMapLocationModal}
                   onPress={() => {
                     setTabIndex(2);
                     closeModal();
                   }}>
-                  {feedLocation.address !== '' ? feedLocation.address : 'Selecionar localização...'}
+                  <View style={styles.feedMapLocationModalContainer}>
+                    <Icon size={20} source="map-marker" color="#228c80" />
+                    <Text style={{ padding: 8 }}>
+                      {feedLocation.address !== ''
+                        ? feedLocation.address
+                        : 'Selecionar localização...'}
+                    </Text>
+                  </View>
                 </Chip>
               </View>
             </Modal>

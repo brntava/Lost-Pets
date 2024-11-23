@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useRef, RefObject, useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { Button, Card, Icon, IconButton, Modal, Portal, Text } from 'react-native-paper';
+import { Button, Card, Icon, IconButton, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from './styles';
@@ -175,18 +175,19 @@ export const CreateLostPetPost = () => {
             <TextInput
               style={styles.input}
               value={petName}
-              maxLength={25}
+              maxLength={40}
               onChangeText={(text: string) => setPetName(text.slice(0, 100))}
               onSubmitEditing={() => handleNextInput(speciesInput)}
               returnKeyType="next"
               placeholder="Nome"
+              placeholderTextColor="#ccc"
             />
             <Text style={styles.label}>Espécie/Raça</Text>
             <TextInput
               ref={speciesInput}
               style={styles.input}
               value={petSpecies}
-              maxLength={25}
+              maxLength={40}
               onChangeText={(text: string) => setPetSpecies(text.slice(0, 100))}
               onSubmitEditing={() => handleNextInput(ageInput)}
               returnKeyType="next"
@@ -347,6 +348,7 @@ export const CreateLostPetPost = () => {
                     </TouchableOpacity>
                   ))}
                 {showSightings &&
+                  sightings.length > 0 &&
                   sightings.map((item: SighthingType, index: number) => {
                     return (
                       <Card style={styles.sightingCard} key={index}>

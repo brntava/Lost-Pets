@@ -3,5 +3,5 @@ export interface ContactType {
   updatedAt: null | Date;
   type: number;
   content: string;
-  id: string;
+  id?: string;
 }
